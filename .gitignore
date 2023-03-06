@@ -7,4 +7,4 @@
 
 # ignore files of the built versions
 src/main
-src/main.dYSM
+src/main.dSYM
