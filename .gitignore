@@ -1,11 +1,9 @@
 # GIT IGNORE FILE
 
-# ignore files according to building with vscode
+# files according to building with vscode
 .vscode
 
-
-
-# ignore files of the built versions
+# files of the built versions
 src/main
 src/main.dSYM
 src/*.exe
