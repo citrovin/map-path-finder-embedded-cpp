@@ -1,3 +1,10 @@
+# GIT IGNORE FILE
+
+# ignore files according to building with vscode
 .vscode
 
+
+
+# ignore files of the built versions
 src/main
+src/main.dYSM
