@@ -25,14 +25,16 @@ struct Edge{
     int id_;
     int source_vid_;
     int dest_vid_;
-    double cost_;
+    double length_;
+    string name_;
 
-    Edge(char type, int id, int source_vid, int dest_vid, double cost){
+    Edge(char type, int id, int source_vid, int dest_vid, double length, string name){
         type_ = type;
         id_ = id;
         source_vid_ =source_vid;
         dest_vid_ = dest_vid;
-        cost_ = cost;
+        length_ = length;
+        name_ = name;
     }
 };
 
@@ -52,8 +54,6 @@ int main(int argc, char *argv[]){
 
         char type='#';
         int id=-1;
-
-        //cout << line << "\n";
 
         if(line[0]=='V'){
             // load vertices (nodes)
@@ -78,16 +78,12 @@ int main(int argc, char *argv[]){
         
         if(line[0]=='E'){
             // load edges
+            string name;
             int source_vid;
             int dest_vid;
-            double cost;
-
-            cout << line << "\n";
+            double length;
 
             type = line[0];
-            line.erase(0, line.find(',')+1);
-
-            id = stoi(line.substr(0, line.find(',')));
             line.erase(0, line.find(',')+1);
 
             source_vid = stoi(line.substr(0, line.find(',')));
@@ -96,15 +92,19 @@ int main(int argc, char *argv[]){
             dest_vid = stoi(line.substr(0, line.find(',')));
             line.erase(0, line.find(',')+1);
 
-            cost = stod(line.substr(0, line.find(',')));
+            length = stod(line.substr(0, line.find(',')));
             line.erase(0, line.find(',')+1);
 
-            edges.emplace_back(Edge(type, id, source_vid, dest_vid, cost));
+            name = line.substr(0, line.find(','));
+            line.erase(0, line.find(',')+1);
+            
+            edges.emplace_back(Edge(type, id, source_vid, dest_vid, length, name));
         }
         
         
     }
 
+    cout << "------------------------------------------------------------------\n";
     for(Vertex ver : nodes){
             cout << "Type: " << ver.type_ 
                             << " ID: " << ver.id_ 
@@ -113,13 +113,15 @@ int main(int argc, char *argv[]){
                             << "\n";
         }
 
-        for(Edge edge : edges){
-            cout << "Type: " << edge.type_ 
-                            << " ID: " << edge.id_ 
-                            << " Long.: " << edge.source_vid_ 
-                            << " Lat.: " << edge.dest_vid_
-                            << " Cost: " << edge.cost_
-                            << "\n";
-        }
+    cout << "------------------------------------------------------------------\n";
+    for(Edge edge : edges){
+        cout << "Type: " << edge.type_ 
+                        << " Long.: " << edge.source_vid_ 
+                        << " Lat.: " << edge.dest_vid_
+                        << " Cost: " << edge.length_
+                        << " Name: " << edge.name_
+                        << "\n";
+    }
+    cout << "------------------------------------------------------------------\n";
     
 }
