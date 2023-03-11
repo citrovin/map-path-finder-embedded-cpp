@@ -58,6 +58,7 @@ class Graph{
     private:
         vector<Vertex> verteces_;
         vector<Edge> edges_;
+        // adjacency list!!!
 
     public:
     Graph(vector<Vertex> verteces, vector<Edge> edges){
