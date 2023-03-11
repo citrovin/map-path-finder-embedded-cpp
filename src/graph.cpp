@@ -6,36 +6,86 @@
 
 using namespace std;
 
-struct Vertex{
-    char type_;
-    int id_;
-    double longitude_;
-    double lattitude_;
+class Vertex{
+    private:
+        int id_;
+        double longitude_;
+        double lattitude_;
 
-    Vertex(char type, int id, double longitude, double lattitude){
-        type_ = type;
+    public:
+    Vertex(int id, double longitude, double lattitude){
         id_ = id;
         longitude_ = longitude;
         lattitude_ = lattitude;
     }
+
+    void const print_vertex(){
+        cout    << "| ID: " << id_ 
+                << "| Long.: " << longitude_ 
+                << "| Lat.: " << lattitude_
+                << "\n";
+    }
 };
 
-struct Edge{
-    char type_;
-    int id_;
-    int source_vid_;
-    int dest_vid_;
-    double length_;
-    string name_;
+class Edge{
+    private:
+        int id_;
+        int source_vid_;
+        int dest_vid_;
+        double length_;
+        string name_;
 
-    Edge(char type, int id, int source_vid, int dest_vid, double length, string name){
-        type_ = type;
+    public:
+    Edge(int id, int source_vid, int dest_vid, double length, string name){
         id_ = id;
         source_vid_ =source_vid;
         dest_vid_ = dest_vid;
         length_ = length;
         name_ = name;
     }
+
+    void const print_edge(){
+        cout    << "| Source ID: " << source_vid_ 
+                << "| Destination ID: " << dest_vid_
+                << "| Length: " << length_
+                << "| Name: " << name_
+                << "\n";
+    }
+};
+
+
+class Graph{
+    private:
+        vector<Vertex> verteces_;
+        vector<Edge> edges_;
+
+    public:
+    Graph(vector<Vertex> verteces, vector<Edge> edges){
+        verteces_ = verteces;
+        edges_ = edges;
+    }
+
+    void const print_verteces(){
+        cout
+        << "Nodes:\n" 
+        << "-------------------------------------------------------------------------------\n";
+        for(Vertex v : verteces_) v.print_vertex();
+        cout
+        << "-------------------------------------------------------------------------------\n";
+    }
+
+
+    void const print_edges(){
+        cout
+        << "\nEdges:\n"
+        << "-------------------------------------------------------------------------------\n";
+        for(Edge e : edges_) e.print_edge();
+        cout
+        << "-------------------------------------------------------------------------------\n";
+    }
+
+
+        
 };
 
 int main(int argc, char *argv[]){
@@ -60,7 +110,6 @@ int main(int argc, char *argv[]){
             double longitude;
             double lattitude;
             
-            type = line[0];
             line.erase(0, line.find(',')+1);
 
             id = stoi(line.substr(0, line.find(',')));
@@ -72,7 +121,7 @@ int main(int argc, char *argv[]){
             lattitude = stod(line.substr(0, line.find(',')));
             line.erase(0, line.find(',')+1);
 
-            nodes.emplace_back(Vertex(type, id, longitude, lattitude));
+            nodes.emplace_back(Vertex(id, longitude, lattitude));
         }
 
         
@@ -83,7 +132,6 @@ int main(int argc, char *argv[]){
             int dest_vid;
             double length;
 
-            type = line[0];
             line.erase(0, line.find(',')+1);
 
             source_vid = stoi(line.substr(0, line.find(',')));
@@ -98,30 +146,15 @@ int main(int argc, char *argv[]){
             name = line.substr(0, line.find(','));
             line.erase(0, line.find(',')+1);
 
-            edges.emplace_back(Edge(type, id, source_vid, dest_vid, length, name));
+            edges.emplace_back(Edge(id, source_vid, dest_vid, length, name));
         }
         
         
     }
 
-    cout << "------------------------------------------------------------------\n";
-    for(Vertex ver : nodes){
-            cout << "Type: " << ver.type_ 
-                            << "| ID: " << ver.id_ 
-                            << "| Long.: " << ver.longitude_ 
-                            << "| Lat.: " << ver.lattitude_
-                            << "\n";
-        }
+    Graph g = Graph(nodes, edges);
 
-    cout << "------------------------------------------------------------------\n";
-    for(Edge edge : edges){
-        cout << "Type: " << edge.type_ 
-                        << "| Source ID: " << edge.source_vid_ 
-                        << "| Destination ID: " << edge.dest_vid_
-                        << "| Length: " << edge.length_
-                        << "| Name: " << edge.name_
-                        << "\n";
-    }
-    cout << "------------------------------------------------------------------\n";
+    g.print_verteces();
+    g.print_edges();
     
 }
