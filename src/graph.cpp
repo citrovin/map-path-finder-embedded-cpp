@@ -97,7 +97,7 @@ int main(int argc, char *argv[]){
 
             name = line.substr(0, line.find(','));
             line.erase(0, line.find(',')+1);
-            
+
             edges.emplace_back(Edge(type, id, source_vid, dest_vid, length, name));
         }
         
@@ -107,19 +107,19 @@ int main(int argc, char *argv[]){
     cout << "------------------------------------------------------------------\n";
     for(Vertex ver : nodes){
             cout << "Type: " << ver.type_ 
-                            << " ID: " << ver.id_ 
-                            << " Long.: " << ver.longitude_ 
-                            << " Lat.: " << ver.lattitude_
+                            << "| ID: " << ver.id_ 
+                            << "| Long.: " << ver.longitude_ 
+                            << "| Lat.: " << ver.lattitude_
                             << "\n";
         }
 
     cout << "------------------------------------------------------------------\n";
     for(Edge edge : edges){
         cout << "Type: " << edge.type_ 
-                        << " Long.: " << edge.source_vid_ 
-                        << " Lat.: " << edge.dest_vid_
-                        << " Cost: " << edge.length_
-                        << " Name: " << edge.name_
+                        << "| Source ID: " << edge.source_vid_ 
+                        << "| Destination ID: " << edge.dest_vid_
+                        << "| Length: " << edge.length_
+                        << "| Name: " << edge.name_
                         << "\n";
     }
     cout << "------------------------------------------------------------------\n";
