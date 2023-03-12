@@ -12,6 +12,7 @@ class Vertex{
         int id_;
         double longitude_;
         double lattitude_;
+        vector<int> adjacency_list_;
 
     Vertex(){};
     Vertex(int id, double longitude, double lattitude){
@@ -25,7 +26,13 @@ class Vertex{
         cout    << "| ID: " << id_ 
                 << "\t| Long.: " << longitude_ 
                 << "\t| Lat.: " << lattitude_
-                << "\n";
+                << "\t| Adjacency list: {";
+
+        for(int i : adjacency_list_){
+            cout << i << " ";
+        }
+
+        cout << "}" << endl;
     }
 };
 
@@ -53,36 +60,12 @@ class Edge{
 };
 
 
-class AdjacencyElement{
-    public:
-        Vertex v_;
-        vector<int> adjacent_elements_;
-
-        AdjacencyElement(Vertex v, vector<int> adjacent_elements){
-            v_=v;
-            adjacent_elements_=adjacent_elements;
-        }
-        AdjacencyElement(){};
-
-        void const print_adjacent_elements(){
-            cout << "Source Node: "<< v_.id_
-            << "\t | Destination Nodes: {";
-            for(int i : adjacent_elements_){
-                cout << i << " ";
-            }
-            cout << "}\n";
-        }
-};
-
-
 class Graph{
     private:
         vector<Vertex> verteces_;
         vector<Edge> edges_;
 
     public:
-    unordered_map<int, AdjacencyElement> adjacent_list_;
-
     Graph(string file_name){
 
         ifstream file_stream;
@@ -137,32 +120,19 @@ class Graph{
                 name = line.substr(0, line.find(','));
                 line.erase(0, line.find(',')+1);
 
-                edges_.emplace_back(Edge(source_vid, dest_vid, length, name));
-            }
-            
-            
-        }
+                Edge edge = Edge(source_vid, dest_vid, length, name);
 
-        // create adjaceny list
-        for(Edge e : edges_){
-            if(auto it = adjacent_list_.find(e.source_vid_); it!=adjacent_list_.end()){
-                // if node is already in the list, insert the destination node to adjacency list of corresponding node
-                it->second.adjacent_elements_.emplace_back(e.dest_vid_);
-                
-            }else{
-                // if node is not yet in the list, create new entry
-                vector<int> dest_nodes {e.dest_vid_};
-                AdjacencyElement adjacent;
-                
-                for(Vertex v : verteces_){
-                    if(v.id_==e.source_vid_){
-                        adjacent = AdjacencyElement(v, dest_nodes);
+                edges_.emplace_back(edge);
+
+                // does not work!!!
+                for(Vertex& v : verteces_){
+                    if(v.id_==edge.source_vid_){
+                        v.adjacency_list_.emplace_back(edge.dest_vid_);
                     }
                 }
-
-                adjacent_list_.insert({e.source_vid_, adjacent});
             }
-
+            
+            
         }
 
     }
@@ -173,15 +143,6 @@ class Graph{
             << "# Nodes: " << verteces_.size() << "\n"
             << "# Edges: " << edges_.size() << "\n"
             << "--------------\n";
-    }
-
-    void const print_adjacent_list(){
-        cout << "\nAdjacent list: \n"
-        << "---------------------------------------------------------" << endl;
-        for(auto it : adjacent_list_){
-            it.second.print_adjacent_elements();
-        }
-        cout << "---------------------------------------------------------" << endl;
     }
 
     void const print_verteces(){
