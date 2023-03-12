@@ -5,10 +5,13 @@
 
 # files of the built versions
 src/main
-src/main.dSYM
+src/graph
+
+src/*.dSYM
 src/*.exe
 src/*.out
 src/*.app
 
 # object files
 src/*.o
+
