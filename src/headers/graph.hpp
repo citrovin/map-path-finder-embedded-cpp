@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -77,17 +79,72 @@ class Graph{
     private:
         vector<Vertex> verteces_;
         vector<Edge> edges_;
-        
 
     public:
     unordered_map<int, AdjacencyElement> adjacent_list_;
 
-    Graph(vector<Vertex> verteces, vector<Edge> edges){
-        verteces_ = verteces;
-        edges_ = edges;
+    Graph(string file_name){
+
+        ifstream file_stream;
+        file_stream.open(file_name, ios::in);
+        string line;
+
+        while (getline(file_stream, line)) {
+            if(line[0]=='#') continue;
+            std::istringstream stream(line);
+
+            char type='#';
+            int id=-1;
+
+            if(line[0]=='V'){
+                // load vertices (nodes)
+                double longitude;
+                double lattitude;
+                
+                line.erase(0, line.find(',')+1);
+
+                id = stoi(line.substr(0, line.find(',')));
+                line.erase(0, line.find(',')+1);
+
+                longitude = stod(line.substr(0, line.find(',')));
+                line.erase(0, line.find(',')+1);
+
+                lattitude = stod(line.substr(0, line.find(',')));
+                line.erase(0, line.find(',')+1);
+
+                verteces_.emplace_back(Vertex(id, longitude, lattitude));
+            }
+
+            
+            if(line[0]=='E'){
+                // load edges
+                string name;
+                int source_vid;
+                int dest_vid;
+                double length;
+
+                line.erase(0, line.find(',')+1);
+
+                source_vid = stoi(line.substr(0, line.find(',')));
+                line.erase(0, line.find(',')+1);
+
+                dest_vid = stoi(line.substr(0, line.find(',')));
+                line.erase(0, line.find(',')+1);
+
+                length = stod(line.substr(0, line.find(',')));
+                line.erase(0, line.find(',')+1);
+
+                name = line.substr(0, line.find(','));
+                line.erase(0, line.find(',')+1);
+
+                edges_.emplace_back(Edge(source_vid, dest_vid, length, name));
+            }
+            
+            
+        }
 
         // create adjaceny list
-        for(Edge e : edges){
+        for(Edge e : edges_){
             if(auto it = adjacent_list_.find(e.source_vid_); it!=adjacent_list_.end()){
                 // if node is already in the list, insert the destination node to adjacency list of corresponding node
                 it->second.adjacent_elements_.emplace_back(e.dest_vid_);
@@ -97,7 +154,7 @@ class Graph{
                 vector<int> dest_nodes {e.dest_vid_};
                 AdjacencyElement adjacent;
                 
-                for(Vertex v : verteces){
+                for(Vertex v : verteces_){
                     if(v.id_==e.source_vid_){
                         adjacent = AdjacencyElement(v, dest_nodes);
                     }
