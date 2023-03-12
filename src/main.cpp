@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
 #include "headers/graph.hpp"
 
 int main(int argc, char *argv[]){
@@ -75,5 +74,4 @@ int main(int argc, char *argv[]){
 
     g.print_adjacent_list();
     // g.summary();
-    
 }
