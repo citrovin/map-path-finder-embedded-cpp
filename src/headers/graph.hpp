@@ -1,13 +1,16 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <set>
+#include <queue>
+#include <map>
 
-using namespace std;
+using namespace std; //to be removed in the end
 
-class Vertex{
+class Vertex{ //change to protected and use fucntions to access
     public:
         int id_;
         double longitude_;
@@ -62,8 +65,9 @@ class Edge{
 
 class Graph{
     private:
-        vector<Vertex> verteces_;
-        vector<Edge> edges_;
+        //vector<Vertex> verteces_;
+        vector<Edge> edges_; //do we need this?
+        map<int, Vertex> mapping_; //we can switch to unordered
 
     public:
     Graph(string file_name){
@@ -95,7 +99,8 @@ class Graph{
                 lattitude = stod(line.substr(0, line.find(',')));
                 line.erase(0, line.find(',')+1);
 
-                verteces_.emplace_back(Vertex(id, longitude, lattitude));
+                Vertex vertex = Vertex(id, longitude, lattitude);
+                mapping_.emplace(id, vertex);     //or insert?
             }
 
             
@@ -124,12 +129,7 @@ class Graph{
 
                 edges_.emplace_back(edge);
 
-                // does not work!!!
-                for(Vertex& v : verteces_){
-                    if(v.id_==edge.source_vid_){
-                        v.adjacency_list_.emplace_back(edge.dest_vid_);
-                    }
-                }
+                mapping_[source_vid].adjacency_list_.emplace_back(dest_vid);
             }
             
             
@@ -137,26 +137,107 @@ class Graph{
 
     }
 
+/*
+    //previous version
+    void bfs(uint32_t vstart) 
+    {
+        deque<uint32_t> active_queue; //maybe deque better?
+        set<uint32_t> closed_set;
+        vector<uint32_t> predecessor(mapping_.size(), -1);
+
+        // ID of the start vertex
+        active_queue.push_back(vstart);
+
+        do {
+            // from the current vertex in the front of the queue
+            // compute all vertices reachable in 1 step
+            uint32_t vcurrent = active_queue.front();
+            active_queue.pop_front();
+
+            closed_set.insert(vcurrent);
+            for (auto& vnext : mapping_[vcurrent].adjacency_list_) {
+
+                if (closed_set.find(vnext) != closed_set.end()){
+                    continue;
+                }
+                   
+                if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
+                    active_queue.push_back(vnext);
+                }
+            }
+        } while (active_queue.size() != 0);
+
+        //printing result ...
+        cout << "\nPRINTING BFS..\n";
+        for (const auto& el : closed_set) {
+            auto ver = mapping_[el];
+            ver.print_vertex();
+        }
+    }
+
+*/
+void bfs(uint32_t vstart, uint32_t vend) 
+{
+    deque<uint32_t> active_queue; //maybe deque better?
+    set<uint32_t> closed_set;
+    
+    uint32_t vertex_count = 0;
+
+    // ID of the start vertex
+    active_queue.push_back(vstart);
+
+    while (!active_queue.empty()) {
+        // from the current vertex in the front of the queue
+        // compute all vertices reachable in 1 step
+        uint32_t vcurrent = active_queue.front();
+        active_queue.pop_front();
+
+        closed_set.insert(vcurrent);
+        vertex_count++;
+
+        if (vcurrent == vend) {
+            break;
+        }
+
+        for (auto& vnext : mapping_[vcurrent].adjacency_list_) {
+
+            if (closed_set.find(vnext) != closed_set.end()){
+                continue;
+            }
+               
+            if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
+                active_queue.push_back(vnext);
+            }
+        }
+    }
+
+    //printing result ...
+    cout << "\nPRINTING BFS..\n";
+    for (const auto& el : closed_set) {
+        auto ver = mapping_[el];
+        ver.print_vertex();
+    }
+
+    cout << "Number of vertices visited: " << vertex_count << endl;
+}
+
     void const summary(){
         cout << "\nSummary of Graph:\n"
             << "--------------\n" 
-            << "# Nodes: " << verteces_.size() << "\n"
+            << "# Nodes: " << mapping_.size() << "\n"
             << "# Edges: " << edges_.size() << "\n"
             << "--------------\n";
     }
 
     void const print_verteces(){
-        cout
-        << "Nodes\n" 
+        cout  << "Nodes\n" 
         << "---------------------------------------------------------\n";
-        int count=0;
-        for(Vertex v : verteces_){
-            v.print_vertex();
-            count++;
-            }
-        cout
-        << "---------------------------------------------------------\n"
-        << "Number of Verteces: " << count << endl;
+        for (const auto& pair : mapping_) {
+            auto ver = pair.second;
+            ver.print_vertex();
+        }
+        cout << "---------------------------------------------------------\n"
+        << "Number of Verteces: " << mapping_.size() << endl;
     }
 
 
