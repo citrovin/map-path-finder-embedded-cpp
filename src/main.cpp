@@ -22,8 +22,8 @@ int main(int argc, char *argv[]){
 
             string algorithm = getCmdOption(argv, argv + argc, "--algorithm");
 
+            //  create graph and choose search algorithm
             Graph g = Graph(file_name);
-
             g.bfs(vstart, vend);
             // g.print_verteces();
             // g.print_edges();
