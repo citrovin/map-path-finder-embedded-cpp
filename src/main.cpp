@@ -1,3 +1,16 @@
+/*
+The main reads a file and constructs a grpah from it. Using different search algorithms,
+you can compute the shortest path between verteces, by passing the corresponding arguments.
+
+Arguments:
+    --file data file path
+    --start staring vertex of the search algorithm
+    --end ending vertex of the search algorithm
+    --algorithm algorithm used for search the graph
+
+*/
+
+
 #include <iostream>
 #include <string>
 #include <algorithm>
