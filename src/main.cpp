@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
 
         }catch (const invalid_argument e) {
             std::cout << "Problem while parsing arguments:" <<std::endl;
-            std::cout << "\n\t" << e.what() << endl;
+            std::cout << e.what() << endl;
             return 0;
         }
         
