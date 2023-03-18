@@ -28,6 +28,12 @@ int main(int argc, char *argv[]){
     // instantiate argparser object
     ArgParser ap(argc, argv);
 
+    // set default options
+    std::string file_name = "data/test_data.txt"; // file
+    int vstart = 1; // start node
+    int vend = 100; // end node
+    std::string algorithm = "bfs"; // algorithm used
+
     // ignore other args if display is present
     if(ap.cmdOptionExists("--display")) {
         displayMessage("Display module properly linked.\n");
@@ -35,42 +41,45 @@ int main(int argc, char *argv[]){
         return 0;
     }
 
-    // TODO: modify arg parsing structure to allow mixing and matching arguments i.e. also display at the end if parameter is present
-    // TODO: better arg parsing
-    // TODO: set default pre-runtime args for fast debugging
-    if(ap.cmdOptionExists("--file") && 
-        ap.cmdOptionExists("--start") &&
-        ap.cmdOptionExists("--end") &&
-        ap.cmdOptionExists("--algorithm")
-    ) {
-        string file_name = ap.getCmdOption("--file");
-        try{
-            int vstart = stoi(ap.getCmdOption("--start"));
-            int vend = stoi(ap.getCmdOption("--end"));
-
-            string algorithm = ap.getCmdOption("--algorithm");
-
-            //  create graph and choose search algorithm
-            Graph g = Graph(file_name);
-            g.bfs(vstart, vend);
-            // g.print_verteces();
-            // g.print_edges();
-            // g.summary();
-
-        }catch (const invalid_argument e) {
-            std::cout << "Problem while parsing arguments:" <<std::endl;
-            std::cout << e.what() << endl;
-            return 0;
-        }
+    // print help and exit
+    if(ap.cmdOptionExists("--help") || ap.cmdOptionExists("-h")) {
+        std::cout << "4 arguments may be passed with following options: \n" 
+                << "\t--filename specifies the data file. DEFAULT = 'data/test_data.txt'\n"
+                << "\t--start defines the starting node. DEFAULT = '1'\n"
+                << "\t--end defines the ending node. DEFAULT = '5'\n"
+                << "\t--algorithm defines the preferred search algorithm. DEFAULT = 'bfs'" 
+                << std::endl;
         
-        
-
-    }else{
-        std::cout << "Not enough arguments passed. 4 arguments needed with following mandatory options: \n" 
-        << "\t--filename specifies the data file\n"
-        << "\t--start defines the starting node\n"
-        << "\t--end defines the ending node\n"
-        << "\t--algorithm defines the preferred search algorithm" 
-        << std::endl;
+        return 0;
     }
+
+    // check defined arg options
+    if(ap.cmdOptionExists("--file")) {
+        file_name = ap.getCmdOption("--file");
+    }
+
+    if(ap.cmdOptionExists("--start")) {
+        vstart = stoi(ap.getCmdOption("--start"));
+    }
+
+    if(ap.cmdOptionExists("--end")) {
+        vend = stoi(ap.getCmdOption("--end"));
+    }
+
+    if(ap.cmdOptionExists("--algorithm")) {
+        algorithm = ap.getCmdOption("--algorithm");
+    }
+
+    // resume main execution path
+    file_name = file_name.c_str();
+    Graph g = Graph(file_name);
+
+    // TODO: more algos
+    if(algorithm == "bfs") {
+        g.bfs(vstart, vend);
+    }
+
+    // g.print_verteces();
+    // g.print_edges();
+    // g.summary();
 }
