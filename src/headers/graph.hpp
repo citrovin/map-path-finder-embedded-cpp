@@ -19,14 +19,31 @@ class Vertex{ //change to protected and use fucntions to access
             latitude_ = latitude;
         }
 
-        int getId() const { return id_; }
-        double getLongitude() const { return longitude_; }
-        double getLatitude() const { return latitude_; }
-        const vector<int>& getAdjacencyList() const { return adjacency_list_; }
+        int getId() const { 
+            return id_; 
+        }
+        double getLongitude() const { 
+            return longitude_; 
+        }
+        double getLatitude() const { 
+            return latitude_; 
+        }
+        const vector<int>& getAdjacencyList() const { 
+            return adjacency_list_; 
+        }
 
-        void setId(int id) { id_ = id; }
-        void setLongitude(double longitude) { longitude_ = longitude; }
-        void setLatitude(double latitude) { latitude_ = latitude; }
+        void setId(int id) { 
+            id_ = id; 
+        }
+        void setLongitude(double longitude) { 
+            longitude_ = longitude; 
+        }
+        void setLatitude(double latitude) { 
+            latitude_ = latitude; 
+        }
+        void appendAdjacencyList(int i) {
+            adjacency_list_.emplace_back(i);
+        }
 
         void const print_vertex(){
             
@@ -96,7 +113,7 @@ class Edge{
                     << "\t| Name: " << name_
                     << "\n";
         }
-        
+
     protected:
         int source_vid_;
         int dest_vid_;
@@ -171,7 +188,7 @@ class Graph{
 
                 edges_.emplace_back(edge);
 
-                mapping_[source_vid].adjacency_list_.emplace_back(dest_vid);
+                mapping_[source_vid].appendAdjacencyList(dest_vid);
             }
             
             
@@ -192,7 +209,7 @@ class Graph{
     vector<int> getAdjacencyList(int id) const {
         auto it = mapping_.find(id);
         if (it != mapping_.end()) {
-            return it->second.adjacency_list_;
+            return it->second.getAdjacencyList();
         }
         throw invalid_argument("Vertex not found");
     }
@@ -259,7 +276,7 @@ void bfs(uint32_t vstart, uint32_t vend)
             break;
         }
 
-        for (auto& vnext : mapping_[vcurrent].adjacency_list_) {
+        for (auto& vnext : mapping_[vcurrent].getAdjacencyList()) {
 
             if (closed_set.find(vnext) != closed_set.end()){
                 continue;
