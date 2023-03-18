@@ -88,6 +88,7 @@ class Vertex{ //change to protected and use fucntions to access
         double latitude_;
         double x;
         double y;
+        int parent_;
         vector<int> adjacency_list_;
 };
 
@@ -335,43 +336,61 @@ class Graph{
     
     uint32_t vertex_count = 0;
 
-    // ID of the start vertex
-    active_queue.push_back(vstart);
+        // ID of the start vertex
+        active_queue.push_back(vstart);
 
-    while (!active_queue.empty()) {
-        // from the current vertex in the front of the queue
-        // compute all vertices reachable in 1 step
-        uint32_t vcurrent = active_queue.front();
-        active_queue.pop_front();
+        while (!active_queue.empty()) {
+            // from the current vertex in the front of the queue
+            // compute all vertices reachable in 1 step
+            uint32_t vcurrent = active_queue.front();
+            active_queue.pop_front();
 
-        closed_set.insert(vcurrent);
-        vertex_count++;
+            closed_set.insert(vcurrent);
+            vertex_count++;
 
-        if (vcurrent == vend) {
-            break;
-        }
+            if (vcurrent == vend) {
+                break;
+            }
 
         for (auto& vnext : mapping_[vcurrent].getAdjacencyList()) {
 
-            if (closed_set.find(vnext) != closed_set.end()){
-                continue;
-            }
-               
-            if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
-                active_queue.push_back(vnext);
+                if (closed_set.find(vnext) != closed_set.end()){
+                    continue;
+                }
+                
+                if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
+                    active_queue.push_back(vnext);
+                    mapping_[vnext].parent_ = vcurrent; // Set parent for vnext
+                }
             }
         }
-    }
 
-    //printing result ...
-    cout << "\nPRINTING BFS..\n";
-    for (const auto& el : closed_set) {
-        auto ver = mapping_[el];
-        ver.print_vertex();
-    }
+        //printing result ...
+        cout << "\nPRINTING BFS..\n";
+        for (const auto& el : closed_set) {
+            auto ver = mapping_[el];
+            ver.print_vertex();
+        }
 
-    cout << "Number of vertices visited: " << vertex_count << endl;
-}
+        cout << "Number of vertices visited: " << closed_set.size() << endl;
+
+        vector<uint32_t> path;
+        uint32_t v = vend;
+        while (v != vstart) {
+            path.push_back(v);
+            v = mapping_[v].parent_;
+        }
+        path.push_back(vstart);
+        reverse(path.begin(), path.end());
+
+        // Print out the path
+        cout << "Path: ";
+        for (const auto& vertex_id : path) {
+            cout << vertex_id << "1n";
+        }
+        cout << "Number of vertices visited: " << path.size() << endl;
+        cout << endl;
+    }
 
     void const summary(){
         cout << "\nSummary of Graph:\n"
