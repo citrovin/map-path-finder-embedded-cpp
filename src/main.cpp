@@ -17,63 +17,69 @@ Arguments:
 
 #include "headers/graph.hpp"
 
-char* getCmdOption(char ** begin, char ** end, const std::string & option);
-bool cmdOptionExists(char** begin, char** end, const std::string& option);
-
+// ---- arg parsing --------
+#include "headers/argparser.h"
+// -------------------------
+// ---- DISPLAY MODULE -----
+#include "headers/display.h"
+// -------------------------
 
 int main(int argc, char *argv[]){
-    
-    if(cmdOptionExists(argv, argv+argc, "--file") && 
-        cmdOptionExists(argv, argv+argc, "--start") &&
-        cmdOptionExists(argv, argv+argc, "--end") &&
-        cmdOptionExists(argv, argv+argc, "--algorithm")
-    ) {
-        string file_name = getCmdOption(argv, argv + argc, "--file");
-        try{
-            int vstart = stoi(getCmdOption(argv, argv + argc, "--start"));
-            int vend = stoi(getCmdOption(argv, argv + argc, "--end"));
+    // instantiate argparser object
+    ArgParser ap(argc, argv);
 
-            string algorithm = getCmdOption(argv, argv + argc, "--algorithm");
+    // set default options
+    std::string file_name = "data/test_data.txt"; // file
+    int vstart = 1; // start node
+    int vend = 100; // end node
+    std::string algorithm = "bfs"; // algorithm used
 
-            //  create graph and choose search algorithm
-            Graph g = Graph(file_name);
-            g.bfs(vstart, vend);
-            // g.print_verteces();
-            // g.print_edges();
-            // g.summary();
+    // ignore other args if display is present
+    if(ap.cmdOptionExists("--display")) {
+        displayMessage("Display module properly linked.\n");
 
-        }catch (const invalid_argument e) {
-            std::cout << "Problem while parsing arguments:" <<std::endl;
-            std::cout << e.what() << endl;
-            return 0;
-        }
-        
-        
-
-    }else{
-        std::cout << "Not enough arguments passed. 4 arguments needed with following mandatory options: \n" 
-        << "\t--filename specifies the data file\n"
-        << "\t--start defines the starting node\n"
-        << "\t--end defines the ending node\n"
-        << "\t--algorithm defines the preferred search algorithm" 
-        << std::endl;
+        return 0;
     }
-}
 
-
-
-
-char* getCmdOption(char ** begin, char ** end, const std::string & option)
-{
-    char ** itr = std::find(begin, end, option);
-    if (itr != end && ++itr != end)
-    {
-        return *itr;
+    // print help and exit
+    if(ap.cmdOptionExists("--help") || ap.cmdOptionExists("-h")) {
+        std::cout << "4 arguments may be passed with following options: \n" 
+                << "\t--filename specifies the data file. DEFAULT = 'data/test_data.txt'\n"
+                << "\t--start defines the starting node. DEFAULT = '1'\n"
+                << "\t--end defines the ending node. DEFAULT = '5'\n"
+                << "\t--algorithm defines the preferred search algorithm. DEFAULT = 'bfs'" 
+                << std::endl;
+        
+        return 0;
     }
-    return 0;
-}
 
-bool cmdOptionExists(char** begin, char** end, const std::string& option)
-{
-    return std::find(begin, end, option) != end;
+    // check defined arg options
+    if(ap.cmdOptionExists("--file")) {
+        file_name = ap.getCmdOption("--file");
+    }
+
+    if(ap.cmdOptionExists("--start")) {
+        vstart = stoi(ap.getCmdOption("--start"));
+    }
+
+    if(ap.cmdOptionExists("--end")) {
+        vend = stoi(ap.getCmdOption("--end"));
+    }
+
+    if(ap.cmdOptionExists("--algorithm")) {
+        algorithm = ap.getCmdOption("--algorithm");
+    }
+
+    // resume main execution path
+    file_name = file_name.c_str();
+    Graph g = Graph(file_name);
+
+    // TODO: more algos
+    if(algorithm == "bfs") {
+        g.bfs(vstart, vend);
+    }
+
+    // g.print_verteces();
+    // g.print_edges();
+    // g.summary();
 }
