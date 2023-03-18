@@ -17,17 +17,19 @@ Arguments:
 
 #include "headers/graph.hpp"
 
+// ---- arg parsing --------
+#include "headers/argparser.h"
+// -------------------------
 // ---- DISPLAY MODULE -----
-#include "display/display.h"
+#include "headers/display.h"
 // -------------------------
 
-char* getCmdOption(char ** begin, char ** end, const std::string & option);
-bool cmdOptionExists(char** begin, char** end, const std::string& option);
-
-
 int main(int argc, char *argv[]){
+    // instantiate argparser object
+    ArgParser ap(argc, argv);
+
     // ignore other args if display is present
-    if(cmdOptionExists(argv, argv+argc, "--display")) {
+    if(ap.cmdOptionExists("--display")) {
         displayMessage("Display module properly linked.\n");
 
         return 0;
@@ -36,17 +38,17 @@ int main(int argc, char *argv[]){
     // TODO: modify arg parsing structure to allow mixing and matching arguments i.e. also display at the end if parameter is present
     // TODO: better arg parsing
     // TODO: set default pre-runtime args for fast debugging
-    if(cmdOptionExists(argv, argv+argc, "--file") && 
-        cmdOptionExists(argv, argv+argc, "--start") &&
-        cmdOptionExists(argv, argv+argc, "--end") &&
-        cmdOptionExists(argv, argv+argc, "--algorithm")
+    if(ap.cmdOptionExists("--file") && 
+        ap.cmdOptionExists("--start") &&
+        ap.cmdOptionExists("--end") &&
+        ap.cmdOptionExists("--algorithm")
     ) {
-        string file_name = getCmdOption(argv, argv + argc, "--file");
+        string file_name = ap.getCmdOption("--file");
         try{
-            int vstart = stoi(getCmdOption(argv, argv + argc, "--start"));
-            int vend = stoi(getCmdOption(argv, argv + argc, "--end"));
+            int vstart = stoi(ap.getCmdOption("--start"));
+            int vend = stoi(ap.getCmdOption("--end"));
 
-            string algorithm = getCmdOption(argv, argv + argc, "--algorithm");
+            string algorithm = ap.getCmdOption("--algorithm");
 
             //  create graph and choose search algorithm
             Graph g = Graph(file_name);
@@ -71,22 +73,4 @@ int main(int argc, char *argv[]){
         << "\t--algorithm defines the preferred search algorithm" 
         << std::endl;
     }
-}
-
-
-
-
-char* getCmdOption(char ** begin, char ** end, const std::string & option)
-{
-    char ** itr = std::find(begin, end, option);
-    if (itr != end && ++itr != end)
-    {
-        return *itr;
-    }
-    return 0;
-}
-
-bool cmdOptionExists(char** begin, char** end, const std::string& option)
-{
-    return std::find(begin, end, option) != end;
 }
