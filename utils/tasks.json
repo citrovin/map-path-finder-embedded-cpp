@@ -11,7 +11,6 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${workspaceFolder}/src/*.cpp",
-                "${workspaceFolder}/src/display/*.cpp",
                 "-o",
                 "${workspaceFolder}/${fileBasenameNoExtension}.exe"
             ],
