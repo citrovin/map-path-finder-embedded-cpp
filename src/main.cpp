@@ -17,12 +17,25 @@ Arguments:
 
 #include "headers/graph.hpp"
 
+// ---- DISPLAY MODULE -----
+#include "display/display.h"
+// -------------------------
+
 char* getCmdOption(char ** begin, char ** end, const std::string & option);
 bool cmdOptionExists(char** begin, char** end, const std::string& option);
 
 
 int main(int argc, char *argv[]){
-    
+    // ignore other args if display is present
+    if(cmdOptionExists(argv, argv+argc, "--display")) {
+        displayMessage("Display module properly linked.\n");
+
+        return 0;
+    }
+
+    // TODO: modify arg parsing structure to allow mixing and matching arguments i.e. also display at the end if parameter is present
+    // TODO: better arg parsing
+    // TODO: set default pre-runtime args for fast debugging
     if(cmdOptionExists(argv, argv+argc, "--file") && 
         cmdOptionExists(argv, argv+argc, "--start") &&
         cmdOptionExists(argv, argv+argc, "--end") &&

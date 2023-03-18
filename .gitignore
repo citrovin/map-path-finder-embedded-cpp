@@ -15,3 +15,5 @@ src/*.app
 # object files
 src/*.o
 
+# built files in workspace
+*.exe
