@@ -30,9 +30,10 @@ int main(int argc, char *argv[]){
 
     // set default options
     std::string file_name = "data/test_data.txt"; // file
-    int vstart = 1; // start node
-    int vend = 100; // end node
+    int vstart = 2; // start node
+    int vend = 500; // end node
     std::string algorithm = "bfs"; // algorithm used
+    bool print_vertices = false, print_edges = false;
 
     // ignore other args if display is present
     if(ap.cmdOptionExists("--display")) {
@@ -69,6 +70,14 @@ int main(int argc, char *argv[]){
     if(ap.cmdOptionExists("--algorithm")) {
         algorithm = ap.getCmdOption("--algorithm");
     }
+    
+    if(ap.cmdOptionExists("--vertices")) {
+        print_vertices = true;
+    }
+
+    if(ap.cmdOptionExists("--edges")) {
+        print_edges = true;
+    }
 
     // resume main execution path
     file_name = file_name.c_str();
@@ -79,7 +88,13 @@ int main(int argc, char *argv[]){
         g.bfs(vstart, vend);
     }
 
-    // g.print_verteces();
-    // g.print_edges();
+    if(print_vertices) {
+        g.print_verteces();
+    }
+
+    if(print_edges) {
+        g.print_edges();
+    }
+
     // g.summary();
 }

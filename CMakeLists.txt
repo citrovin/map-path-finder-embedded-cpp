@@ -17,6 +17,11 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        xhrdraw.cpp
+        xhrdraw.h
+        src/headers/graph.hpp
+        data/test_data.txt
+        data/graph_dc_area.2022-03-11.txt
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

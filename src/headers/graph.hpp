@@ -1,3 +1,6 @@
+#ifndef GRAPH_HPP
+#define GRAPH_HPP
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -7,6 +10,7 @@
 #include <set>
 #include <queue>
 #include <map>
+#include <cmath>
 
 using namespace std; //to be removed in the end
 
@@ -28,12 +32,24 @@ class Vertex{ //change to protected and use fucntions to access
         double getLatitude() const { 
             return latitude_; 
         }
+        double getX() const {
+            return x;
+        }
+        double getY() const {
+            return y;
+        }
         const vector<int>& getAdjacencyList() const { 
             return adjacency_list_; 
         }
 
         void setId(int id) { 
             id_ = id; 
+        }
+        void setX(double _x) {
+            x = _x;
+        }
+        void setY(double _y) {
+            y = _y;
         }
         void setLongitude(double longitude) { 
             longitude_ = longitude; 
@@ -49,7 +65,9 @@ class Vertex{ //change to protected and use fucntions to access
             
             cout    << "| ID: " << id_ 
                     << "\t| Long.: " << longitude_ 
+                    << "\t| X: " << x
                     << "\t| Lat.: " << latitude_
+                    << "\t| Y: " << y
                     << "\t| Adjacency list: {";
 
             for(int i : adjacency_list_){
@@ -62,6 +80,8 @@ class Vertex{ //change to protected and use fucntions to access
         int id_;
         double longitude_;
         double latitude_;
+        double x;
+        double y;
         vector<int> adjacency_list_;
 };
 
@@ -128,13 +148,67 @@ class Graph{
         vector<Edge> edges_; //do we need this?
         map<int, Vertex> mapping_; //we can switch to unordered
 
+        // earth radius
+        int R = 6371009;
+        double l0 = 0;
+
+        // compute longitudinal center
+        double computeLongitudinalCenter() {
+            double sum = 0.0;
+            int num = 0;
+            for (const auto& vertex : getVertices()) {
+                sum += vertex.getLongitude();
+                num++;
+            }
+            return sum / num;
+        }
+
+        // compute mercator x
+        double computeMercatorX(double longitude) {
+            return R * (longitude - l0);
+        }
+
+        // compute mercator y
+        double computeMercatorY(double latitude) {
+            return R * log(tan(M_PI/4 + latitude/2));
+        }
+
+        // min and max
+        double maxX, maxY, minX, minY;
+
+        // compute min max
+        void computeBoundaries() {
+            vector<Vertex> v = getVertices();
+
+            // max x
+            auto maxXVertexIt = std::max_element(v.begin(), v.end(), 
+                [](const Vertex& a, const Vertex& b) { return a.getX() < b.getX(); });
+            
+            // max y
+            auto maxYVertexIt = std::max_element(v.begin(), v.end(), 
+                [](const Vertex& a, const Vertex& b) { return a.getY() < b.getY(); });
+
+            // min x
+            auto minXVertexIt = std::min_element(v.begin(), v.end(), 
+                [](const Vertex& a, const Vertex& b) { return a.getX() < b.getX(); });
+            
+            // min y
+            auto minYVertexIt = std::min_element(v.begin(), v.end(), 
+                [](const Vertex& a, const Vertex& b) { return a.getY() < b.getY(); });
+            
+            maxX = maxXVertexIt -> getX();
+            maxY = maxYVertexIt -> getY();
+            minX = minXVertexIt -> getX();
+            minY = minYVertexIt -> getY();
+        }
+
     public:
     Graph(string file_name){
-
         ifstream file_stream;
         file_stream.open(file_name, ios::in);
         string line;
 
+        // graph loading
         while (getline(file_stream, line)) {
             if(line[0]=='#') continue;
             std::istringstream stream(line);
@@ -194,6 +268,16 @@ class Graph{
             
         }
 
+        // mercator
+        l0 = computeLongitudinalCenter();
+
+        for (auto& m : mapping_) {
+            m.second.setX(computeMercatorX(m.second.getLongitude()));
+            m.second.setY(computeMercatorY(m.second.getLatitude()));
+        }
+
+        // compute min max
+        computeBoundaries();
     }
 
     // vertices in the graph
@@ -214,46 +298,34 @@ class Graph{
         throw invalid_argument("Vertex not found");
     }
 
-/*
-    //previous version
-    void bfs(uint32_t vstart) 
-    {
-        deque<uint32_t> active_queue; //maybe deque better?
-        set<uint32_t> closed_set;
-        vector<uint32_t> predecessor(mapping_.size(), -1);
-
-        // ID of the start vertex
-        active_queue.push_back(vstart);
-
-        do {
-            // from the current vertex in the front of the queue
-            // compute all vertices reachable in 1 step
-            uint32_t vcurrent = active_queue.front();
-            active_queue.pop_front();
-
-            closed_set.insert(vcurrent);
-            for (auto& vnext : mapping_[vcurrent].adjacency_list_) {
-
-                if (closed_set.find(vnext) != closed_set.end()){
-                    continue;
-                }
-                   
-                if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
-                    active_queue.push_back(vnext);
-                }
+    // get vertex by id
+    Vertex getVertexById(int id) const {
+        for (const auto& vertex : getVertices()) {
+            if (vertex.getId() == id) {
+                return vertex;
             }
-        } while (active_queue.size() != 0);
-
-        //printing result ...
-        cout << "\nPRINTING BFS..\n";
-        for (const auto& el : closed_set) {
-            auto ver = mapping_[el];
-            ver.print_vertex();
         }
+        // if no vertex is found
+        throw std::runtime_error("Vertex with ID " + std::to_string(id) + " not found.");
     }
 
-*/
-void bfs(uint32_t vstart, uint32_t vend) 
+    double getMinX() const {
+        return minX;
+    }
+
+    double getMinY() const {
+        return minY;
+    }
+
+    double getMaxX() const {
+        return maxX;
+    }
+
+    double getMaxY() const {
+        return maxY;
+    }
+
+    void bfs(uint32_t vstart, uint32_t vend) 
 {
     deque<uint32_t> active_queue; //maybe deque better?
     set<uint32_t> closed_set;
@@ -314,9 +386,8 @@ void bfs(uint32_t vstart, uint32_t vend)
             ver.print_vertex();
         }
         cout << "---------------------------------------------------------\n"
-        << "Number of Verteces: " << mapping_.size() << endl;
+        << "Number of Verteces: " << mapping_.size() << " MinX: " << getMinX() << " MinY: " << getMinY() << " MaxX: " << getMaxX() << " MaxY: " << getMaxY() << endl;
     }
-
 
     void const print_edges(){
         cout
@@ -332,3 +403,5 @@ void bfs(uint32_t vstart, uint32_t vend)
         << "Number of Edges: " << count << endl;
     }      
 };
+
+#endif // GRAPH_HPP
