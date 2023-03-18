@@ -12,54 +12,96 @@ using namespace std; //to be removed in the end
 
 class Vertex{ //change to protected and use fucntions to access
     public:
-        int id_;
-        double longitude_;
-        double lattitude_;
-        vector<int> adjacency_list_;
-
-    Vertex(){};
-    Vertex(int id, double longitude, double lattitude){
-        id_ = id;
-        longitude_ = longitude;
-        lattitude_ = lattitude;
-    }
-
-    void const print_vertex(){
-        
-        cout    << "| ID: " << id_ 
-                << "\t| Long.: " << longitude_ 
-                << "\t| Lat.: " << lattitude_
-                << "\t| Adjacency list: {";
-
-        for(int i : adjacency_list_){
-            cout << i << " ";
+        Vertex(){};
+        Vertex(int id, double longitude, double latitude){
+            id_ = id;
+            longitude_ = longitude;
+            latitude_ = latitude;
         }
 
-        cout << "}" << endl;
-    }
+        int getId() const { return id_; }
+        double getLongitude() const { return longitude_; }
+        double getLatitude() const { return latitude_; }
+        const vector<int>& getAdjacencyList() const { return adjacency_list_; }
+
+        void setId(int id) { id_ = id; }
+        void setLongitude(double longitude) { longitude_ = longitude; }
+        void setLatitude(double latitude) { latitude_ = latitude; }
+
+        void const print_vertex(){
+            
+            cout    << "| ID: " << id_ 
+                    << "\t| Long.: " << longitude_ 
+                    << "\t| Lat.: " << latitude_
+                    << "\t| Adjacency list: {";
+
+            for(int i : adjacency_list_){
+                cout << i << " ";
+            }
+
+            cout << "}" << endl;
+        }
+    protected:
+        int id_;
+        double longitude_;
+        double latitude_;
+        vector<int> adjacency_list_;
 };
 
 class Edge{
     public:
+        Edge(int source_vid, int dest_vid, double length, string name){
+            source_vid_ =source_vid;
+            dest_vid_ = dest_vid;
+            length_ = length;
+            name_ = name;
+        }
+
+        int getSourceVid() const {
+            return source_vid_;
+        }
+
+        int getDestVid() const {
+            return dest_vid_;
+        }
+
+        double getLength() const {
+            return length_;
+        }
+
+        string getName() const {
+            return name_;
+        }
+
+        void setSourceVid(int source_vid){
+            source_vid_ = source_vid;
+        }
+
+        void setDestVid(int dest_vid){
+            dest_vid_ = dest_vid;
+        }
+
+        void setLength(double length){
+            length_ = length;
+        }
+
+        void setName(string name){
+            name_ = name;
+        }
+
+        void const print_edge(){
+            cout    << "| Source ID: " << source_vid_ 
+                    << "\t| Destination ID: " << dest_vid_
+                    << "\t| Length: " << length_
+                    << "\t| Name: " << name_
+                    << "\n";
+        }
+        
+    protected:
         int source_vid_;
         int dest_vid_;
         double length_;
         string name_;
-
-    Edge(int source_vid, int dest_vid, double length, string name){
-        source_vid_ =source_vid;
-        dest_vid_ = dest_vid;
-        length_ = length;
-        name_ = name;
-    }
-
-    void const print_edge(){
-        cout    << "| Source ID: " << source_vid_ 
-                << "\t| Destination ID: " << dest_vid_
-                << "\t| Length: " << length_
-                << "\t| Name: " << name_
-                << "\n";
-    }
 };
 
 
@@ -135,6 +177,24 @@ class Graph{
             
         }
 
+    }
+
+    // vertices in the graph
+    vector<Vertex> getVertices() const {
+        vector<Vertex> vertices;
+        for (const auto& p : mapping_) {
+            vertices.push_back(p.second);
+        }
+        return vertices;
+    }
+
+    // adjacency list of a vertex given its ID
+    vector<int> getAdjacencyList(int id) const {
+        auto it = mapping_.find(id);
+        if (it != mapping_.end()) {
+            return it->second.adjacency_list_;
+        }
+        throw invalid_argument("Vertex not found");
     }
 
 /*
