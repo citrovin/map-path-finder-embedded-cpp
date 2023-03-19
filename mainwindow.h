@@ -49,6 +49,8 @@ private slots:
 
     void on_tool_move_button_released();
 
+    void on_util_reset_rotation_button_released();
+
 private:
     Ui::MainWindow *ui;
     std::string tool = "select";

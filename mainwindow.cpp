@@ -46,39 +46,48 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         if(getTool() == "zoom") {
             if (mouseEvent->button() == Qt::LeftButton)
             {
+                QPointF viewCenter = graphicsView->viewport()->rect().center();
                 // Get the position of the mouse click relative to the graphics view
                 QPointF point = graphicsView->mapToScene(mouseEvent->pos());
 
-                // get zoom
-                qreal currentScale = graphicsView->transform().m11();
+                QTransform transform = graphicsView->transform(); // current view transform
+                qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
+
+                // adjust the scene position based on the zoom factor
+                point = viewCenter + (point - viewCenter) / zoom;
 
                 // Perform the zoom in operation centered on the mouse click position
-                graphicsView->scale(1.2, 1.2);
                 graphicsView->centerOn(point);
+                graphicsView->scale(1.2, 1.2);
+
 
                 // Adjust the size of all shapes based on the new zoom level
-                qreal newScale = graphicsView->transform().m11();
-                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-                    item->setScale(item->scale() * newScale / currentScale);
-                }
+//                qreal newScale = qMax(transform.m11(), transform.m22());
+//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+//                    item->setScale(item->scale() * newScale / zoom);
+//                }
             }
             if (mouseEvent->button() == Qt::RightButton)
             {
                 // Get the position of the mouse click relative to the graphics view
                 QPointF point = graphicsView->mapToScene(mouseEvent->pos());
 
-                // get zoom
-                qreal currentScale = graphicsView->transform().m11();
+                QTransform transform = graphicsView->transform(); // current view transform
+                qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
+
+                // adjust the scene position based on the zoom factor
+                point.setX(point.x() / zoom);
+                point.setY(point.y() / zoom);
 
                 // Perform the zoom in operation centered on the mouse click position
                 graphicsView->scale(0.8, 0.8);
                 graphicsView->centerOn(point);
 
                 // Adjust the size of all shapes based on the new zoom level
-                qreal newScale = graphicsView->transform().m11();
-                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-                    item->setScale(item->scale() * newScale / currentScale);
-                }
+//                qreal newScale = qMax(transform.m11(), transform.m22());
+//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+//                    item->setScale(item->scale() * newScale / zoom);
+//                }
             }
         } else if (getTool() == "select"){
             if (mouseEvent->button() == Qt::LeftButton)
@@ -327,5 +336,17 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
 void MainWindow::on_tool_move_button_released()
 {
     selectTool("move");
+}
+
+
+void MainWindow::on_util_reset_rotation_button_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+    QTransform transform;
+    transform.reset();
+    graphicsView->setTransform(transform);
+
+    // reset slider
+    ui->horizontalSlider->setSliderPosition(0);
 }
 
