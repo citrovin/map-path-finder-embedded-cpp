@@ -305,13 +305,11 @@ class Graph{
 
     // get vertex by id
     Vertex getVertexById(int id) const {
-        for (const auto& vertex : getVertices()) {
-            if (vertex.getId() == id) {
-                return vertex;
-            }
+        auto it = mapping_.find(id);
+        if (it == mapping_.end()) {
+            throw std::runtime_error("Vertex with ID " + std::to_string(id) + " not found.");
         }
-        // if no vertex is found
-        throw std::runtime_error("Vertex with ID " + std::to_string(id) + " not found.");
+        return it->second;
     }
 
     double getMinX() const {

@@ -21,6 +21,8 @@ set(PROJECT_SOURCES
         xhrdraw.h
         progressbar.cpp
         progressbar.h
+        messagebox.cpp
+        messagebox.h
         src/headers/graph.hpp
         src/headers/display.h
         src/display.cpp

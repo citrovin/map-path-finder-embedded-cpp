@@ -2,9 +2,11 @@
 #include "./ui_mainwindow.h"
 #include <QFile>
 #include <QMessageBox>
+#include <QElapsedTimer>
 
 #include "progressbar.h"
 #include "xhrdraw.h"
+#include "messagebox.h"
 #include "src/headers/display.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -83,6 +85,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::on_load_graph_button_released()
 {
+    // Timing
+    QElapsedTimer timer;
+    timer.start();
+
     // Get the graphics view from the UI
     QGraphicsView* graphicsView = ui->graphicsView;
 
@@ -121,5 +127,10 @@ void MainWindow::on_load_graph_button_released()
 
     // Hide the progress bar window when the operation is complete
     progressBarWindow.hide();
+
+    // Code to be timed
+    std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
+    QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
+    MessageBox::show("Elapsed time", str);
 }
 

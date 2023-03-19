@@ -12,6 +12,7 @@ class XHRDraw
 {
 public:
     static void drawCircle(QGraphicsView* view, int x, int y, int r, const QColor& color);
+    static void drawCircleFast(QGraphicsView* view, int x, int y, int r, const QColor& color);
     static void drawLine(QGraphicsView* view, std::vector<std::vector<double>>* points, QColor color, int thickness);
     static void updateView(QGraphicsView* view);
     static void drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow);
