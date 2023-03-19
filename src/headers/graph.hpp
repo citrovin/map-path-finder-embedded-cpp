@@ -378,9 +378,9 @@ class Graph{
         }
    
         vector<uint32_t> path;
-        vector<Edge> edges_crossed; 
+        vector<Edge> edges_crossed;
         uint32_t v = vend;
-        while (v != vstart) {
+        while (v != vstart) {       
             int vOld = v;
             path.push_back(v);
             v = mapping_[v].getParent();
