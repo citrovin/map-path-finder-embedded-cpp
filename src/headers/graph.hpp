@@ -9,6 +9,7 @@
 #include <vector>
 #include <set>
 #include <queue>
+#include <iomanip>
 #include <map>
 #include <cmath>
 #include <iomanip>
@@ -44,6 +45,10 @@ class Vertex{ //change to protected and use fucntions to access
         double getY() const {
             return y;
         }
+        int getParent() {
+            return parent_;
+        }
+
         const vector<int>& getAdjacencyList() const { 
             return adjacency_list_; 
         }
@@ -63,9 +68,14 @@ class Vertex{ //change to protected and use fucntions to access
         void setLatitude(double latitude) { 
             latitude_ = latitude; 
         }
+        void setParent(int parent) {
+            parent_= parent;
+        }
         void appendAdjacencyList(int i) {
             adjacency_list_.emplace_back(i);
         }
+
+
 
         void const print_vertex(){
             
@@ -88,12 +98,13 @@ class Vertex{ //change to protected and use fucntions to access
         double latitude_;
         double x;
         double y;
-        int parent_;
+        int parent_; //only used in the cases of path tracing (good idea to have it here or not?)
         vector<int> adjacency_list_;
 };
 
 class Edge{
     public:
+        Edge() : source_vid_(0), dest_vid_(0), length_(0), name_("") {} //default constructor
         Edge(int source_vid, int dest_vid, double length, string name){
             source_vid_ =source_vid;
             dest_vid_ = dest_vid;
@@ -151,10 +162,11 @@ class Edge{
 
 class Graph{
     private:
-        //vector<Vertex> verteces_;
-        vector<Edge> edges_; //do we need this? - christian says yes
+        
+        vector<Edge> edges_; //do we need this? - christian says yes -> No use only the mapping!! rember filippo remove this!!
         map<int, Vertex> mapping_; //we can switch to unordered
-
+        map<pair<uint32_t, uint32_t>, Edge> edge_weights;
+        
         // earth radius
         int R = 6371009;
         double l0 = 0;
@@ -268,11 +280,12 @@ class Graph{
                 name = line.substr(0, line.find(','));
                 line.erase(0, line.find(',')+1);
 
-                Edge edge = Edge(source_vid, dest_vid, length, name);
+                Edge edge(source_vid, dest_vid, length, name);
 
                 edges_.emplace_back(edge);
 
                 mapping_[source_vid].appendAdjacencyList(dest_vid);
+                edge_weights.insert(make_pair(make_pair(source_vid, dest_vid),edge));
             }
             
             
@@ -330,11 +343,10 @@ class Graph{
     }
 
     void bfs(uint32_t vstart, uint32_t vend) 
-{
-    deque<uint32_t> active_queue; //maybe deque better?
-    set<uint32_t> closed_set;
-    
-    uint32_t vertex_count = 0;
+    {
+        deque<uint32_t> active_queue; //maybe deque better?
+        set<uint32_t> closed_set;
+        
 
         // ID of the start vertex
         active_queue.push_back(vstart);
@@ -346,7 +358,7 @@ class Graph{
             active_queue.pop_front();
 
             closed_set.insert(vcurrent);
-            vertex_count++;
+
 
             if (vcurrent == vend) {
                 break;
@@ -360,36 +372,55 @@ class Graph{
                 
                 if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
                     active_queue.push_back(vnext);
-                    mapping_[vnext].parent_ = vcurrent; // Set parent for vnext
+                    mapping_[vnext].setParent(vcurrent); // Set parent for vnext (can be overwritten but is fine)
                 }
             }
         }
-
-        //printing result ...
-        cout << "\nPRINTING BFS..\n";
-        for (const auto& el : closed_set) {
-            auto ver = mapping_[el];
-            ver.print_vertex();
-        }
-
-        cout << "Number of vertices visited: " << closed_set.size() << endl;
-
+   
         vector<uint32_t> path;
+        vector<Edge> edges_crossed; 
         uint32_t v = vend;
         while (v != vstart) {
+            int vOld = v;
             path.push_back(v);
-            v = mapping_[v].parent_;
+            v = mapping_[v].getParent();
+            edges_crossed.push_back(edge_weights[make_pair(v,vOld)]);
         }
+
         path.push_back(vstart);
         reverse(path.begin(), path.end());
+        reverse(edges_crossed.begin(), edges_crossed.end());
+
+        cout << "Number of vertices visited: " << closed_set.size() << endl;
+        cout << "Number of vertex on path from start to end: " << path.size() << endl;
 
         // Print out the path
-        cout << "Path: ";
-        for (const auto& vertex_id : path) {
-            cout << vertex_id << "1n";
+        double total_length = 0;
+        for (int i=0; i<path.size(); i++) {
+            cout << "Vertex[\t" << i << "] = " << path[i] 
+                 << ", length =\t" << total_length << endl;
+            total_length += edges_crossed[i].getLength();
         }
-        cout << "Number of vertices visited: " << path.size() << endl;
+        
         cout << endl;
+    }
+
+    // vertices in the graph
+    vector<Vertex> getVertices() const {
+        vector<Vertex> vertices;
+        for (const auto& p : mapping_) {
+            vertices.push_back(p.second);
+        }
+        return vertices;
+    }
+
+    // adjacency list of a vertex given its ID
+    vector<int> getAdjacencyList(int id) const {
+        auto it = mapping_.find(id);
+        if (it != mapping_.end()) {
+            return it->second.getAdjacencyList();
+        }
+        throw invalid_argument("Vertex not found");
     }
 
     void const summary(){
