@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 9.0.2, 2023-03-18T17:00:37. -->
+<!-- Written by QtCreator 9.0.2, 2023-03-19T09:59:52. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -386,7 +386,6 @@
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">D:/Projects/SA/EC++/map-path-finder-embedded-cpp/build-qtapp-Desktop_Qt_6_4_3_MinGW_64_bit-Debug</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

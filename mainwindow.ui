@@ -24,6 +24,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="load_graph_button">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>380</y>
+      <width>101</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load Graph</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -4,6 +4,6 @@
 #include "graph.hpp"
 
 void displayMessage(const char* message);
-std::vector<double, double> transformToMercator(std::vector<Vertex> vertices);
+Graph loadGraph(std::string fileName);
 
 #endif // DISPLAY_H

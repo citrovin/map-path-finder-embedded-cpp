@@ -17,6 +17,9 @@ public:
     ~MainWindow();
     bool eventFilter(QObject *obj, QEvent *event);
 
+private slots:
+    void on_load_graph_button_released();
+
 private:
     Ui::MainWindow *ui;
 };

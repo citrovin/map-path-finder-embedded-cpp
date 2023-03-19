@@ -19,9 +19,14 @@ set(PROJECT_SOURCES
         mainwindow.ui
         xhrdraw.cpp
         xhrdraw.h
+        progressbar.cpp
+        progressbar.h
         src/headers/graph.hpp
+        src/headers/display.h
+        src/display.cpp
         data/test_data.txt
         data/graph_dc_area.2022-03-11.txt
+        data/display.txt
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
