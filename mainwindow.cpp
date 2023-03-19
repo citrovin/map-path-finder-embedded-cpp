@@ -98,9 +98,9 @@ void MainWindow::on_load_graph_button_released()
 
 //    XHRDraw::drawCircle(graphicsView,150, 150, 50, Qt::blue);
 
-//        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
+        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
 //        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\test_data.txt";
-    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
+//    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
     // open the file
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -111,9 +111,9 @@ void MainWindow::on_load_graph_button_released()
     }
 
     // create a Graph object
-    Graph graph = loadGraph(fileName.toStdString());
-//    Graph graph(fileName.toStdString());
-//    graph.computeMercator();
+//    Graph graph = loadGraph(fileName.toStdString());
+    Graph graph(fileName.toStdString());
+    graph.computeMercator();
     int progress_max = graph.getVertices().size() + graph.getEdges().size();
 
     // Create the progress bar window

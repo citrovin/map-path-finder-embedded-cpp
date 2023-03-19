@@ -1,6 +1,5 @@
 // FOR USE WITH VSCODE
 // One button build all
-// TODO: default arg list for one button build + run
 {
     "tasks": [
         {

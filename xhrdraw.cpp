@@ -4,13 +4,13 @@
 #include <QPainter>
 #include <QGraphicsItem>
 
-void XHRDraw::drawCircle(QGraphicsView* view, int x, int y, int r, const QColor& color)
+void XHRDraw::drawCircle(QGraphicsView* view, int x, int y, double r, const QColor& color)
 {
     // Get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
 
     // Create a new ellipse item with the specified dimensions
-    QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(x, y, r, r);
+    QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(QRectF(x - r/2, y - r/2, r, r));
 
     // draw above lines
     ellipse->setZValue(1);
@@ -25,7 +25,7 @@ void XHRDraw::drawCircle(QGraphicsView* view, int x, int y, int r, const QColor&
     scene->addItem(ellipse);
 }
 
-void XHRDraw::drawCircleFast(QGraphicsView* view, int x, int y, int r, const QColor& color)
+void XHRDraw::drawCircleFast(QGraphicsView* view, int x, int y, double r, const QColor& color)
 {
     // Get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
@@ -45,7 +45,7 @@ void XHRDraw::drawCircleFast(QGraphicsView* view, int x, int y, int r, const QCo
     painter.setPen(pen);
 
     // Draw the ellipse on the QPixmap
-    painter.drawEllipse(x, y, r, r);
+    painter.drawEllipse(QRectF(x, y, r, r));
 
     // Add the QPixmap as a QGraphicsPixmapItem to the scene
     QGraphicsPixmapItem* pixmapItem = scene->addPixmap(pixmap);
@@ -54,7 +54,7 @@ void XHRDraw::drawCircleFast(QGraphicsView* view, int x, int y, int r, const QCo
     pixmapItem->setPos(view->mapToScene(0, 0));
 }
 
-void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* lines, QColor color, int thickness) {
+void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* lines, QColor color, double thickness) {
     // get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
 
@@ -79,7 +79,8 @@ void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* li
     path->setPath(pathPoints);
 
     // set the pen color to the given color and thickness
-    QPen pen(color, thickness);
+    QPen pen(color);
+    pen.setWidthF(thickness);
     path->setPen(pen);
 
     // add the path to the scene
@@ -93,7 +94,6 @@ void XHRDraw::updateView(QGraphicsView* view) {
 
 void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow) {
     int progress = 0;
-    int m = progressBarWindow->getMax();
 
     std::vector<std::vector<double>> lines;
 
@@ -106,13 +106,13 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 #pragma omp parallel for
     for (int i = 0; i < verts.size(); ++i) {
         // scale to screen size
-        double scaledX = (verts[i].getX() - graph.getMinX()) * scaleX;
-        double scaledY = (verts[i].getY() - graph.getMinY()) * scaleY;
+        double scaledX = std::round((verts[i].getX() - graph.getMinX()) * scaleX );
+        double scaledY = std::round((verts[i].getY() - graph.getMinY()) * scaleY );
 
 //        std::cout<<scaledX<< " " << scaledY << std::endl;
 
         // draw vertex
-        XHRDraw::drawCircle(graphicsView, scaledX, scaledY, 1, Qt::red);
+        XHRDraw::drawCircle(graphicsView, scaledX, scaledY, 0.2, Qt::red);
 //        std::cout << i << endl;
 //        if (progress/progressBarWindow->getMax())
 //        progressBarWindow->updateProgress(++progress);
@@ -124,8 +124,8 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
             auto adjacent_vertex = graph.getVertexById(adjacent_vertex_id);
 
             // scale to screen size
-            double scaledX2 = (adjacent_vertex.getX() - graph.getMinX()) * scaleX;
-            double scaledY2 = (adjacent_vertex.getY() - graph.getMinY()) * scaleY;
+            double scaledX2 = std::round((adjacent_vertex.getX() - graph.getMinX()) * scaleX );
+            double scaledY2 = std::round((adjacent_vertex.getY() - graph.getMinY()) * scaleY );
 
             // add adjacency lines to vector
             lines.push_back({scaledX,scaledY,scaledX2,scaledY2});
@@ -135,5 +135,5 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
     }
 
     //draw lines
-    XHRDraw::drawLine(graphicsView,&lines,Qt::yellow,1);
+    XHRDraw::drawLine(graphicsView,&lines,Qt::black,0.2);
 }
