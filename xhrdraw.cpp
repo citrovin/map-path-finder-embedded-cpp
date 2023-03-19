@@ -12,6 +12,9 @@ void XHRDraw::drawCircle(QGraphicsView* view, int x, int y, int r, const QColor&
     // Create a new ellipse item with the specified dimensions
     QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(x, y, r, r);
 
+    // draw above lines
+    ellipse->setZValue(1);
+
     // Set the pen color to red
     QPen pen(color);
     QBrush brush(color);
@@ -57,6 +60,9 @@ void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* li
 
     // create a new line item
     QGraphicsPathItem* path = new QGraphicsPathItem();
+
+    // draw below points
+    path->setZValue(0);
 
     // create a QPainterPath object to store the points
     QPainterPath pathPoints;
