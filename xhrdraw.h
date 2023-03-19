@@ -16,6 +16,7 @@ public:
     static void drawLine(QGraphicsView* view, std::vector<std::vector<double>>* points, QColor color, double thickness);
     static void updateView(QGraphicsView* view);
     static void drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow);
+    static void drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id);
 };
 
 #endif // XHRDRAW_H

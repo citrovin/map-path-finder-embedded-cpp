@@ -43,41 +43,118 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress)
     {
         QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(event);
-        if (mouseEvent->button() == Qt::LeftButton)
-        {
-            // Get the position of the mouse click relative to the graphics view
-            QPointF point = graphicsView->mapToScene(mouseEvent->pos());
+        if(getTool() == "zoom") {
+            if (mouseEvent->button() == Qt::LeftButton)
+            {
+                // Get the position of the mouse click relative to the graphics view
+                QPointF point = graphicsView->mapToScene(mouseEvent->pos());
 
-            // get zoom
-            qreal currentScale = graphicsView->transform().m11();
+                // get zoom
+                qreal currentScale = graphicsView->transform().m11();
 
-            // Perform the zoom in operation centered on the mouse click position
-            graphicsView->scale(1.2, 1.2);
-            graphicsView->centerOn(point);
+                // Perform the zoom in operation centered on the mouse click position
+                graphicsView->scale(1.2, 1.2);
+                graphicsView->centerOn(point);
 
-            // Adjust the size of all shapes based on the new zoom level
-            qreal newScale = graphicsView->transform().m11();
-            foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-                item->setScale(item->scale() * newScale / currentScale);
+                // Adjust the size of all shapes based on the new zoom level
+                qreal newScale = graphicsView->transform().m11();
+                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+                    item->setScale(item->scale() * newScale / currentScale);
+                }
             }
-        }
-        if (mouseEvent->button() == Qt::RightButton)
-        {
-            // Get the position of the mouse click relative to the graphics view
-            QPointF point = graphicsView->mapToScene(mouseEvent->pos());
+            if (mouseEvent->button() == Qt::RightButton)
+            {
+                // Get the position of the mouse click relative to the graphics view
+                QPointF point = graphicsView->mapToScene(mouseEvent->pos());
 
-            // get zoom
-            qreal currentScale = graphicsView->transform().m11();
+                // get zoom
+                qreal currentScale = graphicsView->transform().m11();
 
-            // Perform the zoom in operation centered on the mouse click position
-            graphicsView->scale(0.8, 0.8);
-            graphicsView->centerOn(point);
+                // Perform the zoom in operation centered on the mouse click position
+                graphicsView->scale(0.8, 0.8);
+                graphicsView->centerOn(point);
 
-            // Adjust the size of all shapes based on the new zoom level
-            qreal newScale = graphicsView->transform().m11();
-            foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-                item->setScale(item->scale() * newScale / currentScale);
+                // Adjust the size of all shapes based on the new zoom level
+                qreal newScale = graphicsView->transform().m11();
+                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+                    item->setScale(item->scale() * newScale / currentScale);
+                }
             }
+        } else if (getTool() == "select"){
+            if (mouseEvent->button() == Qt::LeftButton)
+            {
+                // Get the position of the mouse click relative to the graphics view
+                QPointF point = graphicsView->mapToScene(mouseEvent->pos());
+
+                QTransform transform = graphicsView->transform(); // current view transform
+                qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
+
+                // adjust the scene position based on the zoom factor
+                point.setX(point.x() / zoom);
+                point.setY(point.y() / zoom);
+
+
+                std::cout<<"Click at: "<<point.x()<< " " <<point.y()<<std::endl;
+
+                // Iterate through all items in the scene to find the closest point
+                QGraphicsItem* closestItem = nullptr;
+                qreal minDistance = std::numeric_limits<qreal>::max();
+
+                std::cout<<"Min dist.: "<<minDistance<<std::endl;
+
+                foreach (QGraphicsItem* item, graphicsView->scene()->items()) {
+                    // Check if the item is selectable and visible
+                    if (item->flags() & QGraphicsItem::ItemIsSelectable && item->isVisible()) {
+                        // Get the center point of the item
+                        QPointF center = item->boundingRect().center();
+
+                        // Compute the distance from the center to the mouse position
+                        qreal distance = QLineF(center, point).length();
+
+//                        std::cout<<"Dist. to closest: "<<distance<<std::endl;
+
+                        // If the distance is smaller than the current minimum, update the closest item and distance
+                        if (distance < minDistance) {
+                            std::cout<<"Found closest point with dist.: "<< distance <<std::endl;
+                            closestItem = item;
+                            minDistance = distance;
+                        }
+                    }
+                }
+
+                if(closestItem != nullptr) {
+                    selectedVertID = closestItem->data(0).toInt();
+
+                    closestItem->grabMouse();
+
+                    // set color as selected vert
+                    if (closestItem && closestItem->type() == QGraphicsEllipseItem::Type) {
+                        QGraphicsEllipseItem* ellipseItem = qgraphicsitem_cast<QGraphicsEllipseItem*>(closestItem);
+                        ellipseItem->setBrush(QBrush(Qt::blue));
+                        ellipseItem->setPen(QPen(Qt::blue));
+                        ellipseItem->setSelected(true);
+                        ellipseItem->setAcceptHoverEvents(false);
+
+                        // reset color of previous selected vert
+                        if(selectedVertItem != nullptr) {
+                            selectedVertItem->setBrush(QBrush(Qt::red));
+                            selectedVertItem->setPen(QPen(Qt::red));
+                            selectedVertItem->setSelected(false);
+                            ellipseItem->setAcceptHoverEvents(true);
+                        }
+
+                        // assign new active item
+                        selectedVertItem = qgraphicsitem_cast<QGraphicsEllipseItem*>(closestItem);
+                    }
+
+                    // update ui
+                    ui->lcd_selected_id->display(selectedVertID);
+                    ui->lcd_selected_x->display(graph.getVertexById(selectedVertID).getX()/1000);
+                    ui->lcd_selected_y->display(graph.getVertexById(selectedVertID).getY()/1000);
+                }
+            }
+
+            std::cout<<selectedVertID<<std::endl;
         }
     }
     return QMainWindow::eventFilter(obj, event);
@@ -112,8 +189,10 @@ void MainWindow::on_load_graph_button_released()
 
     // create a Graph object
 //    Graph graph = loadGraph(fileName.toStdString());
-    Graph graph(fileName.toStdString());
-    graph.computeMercator();
+    Graph g(fileName.toStdString());
+    g.computeMercator();
+
+    graph = g;
     int progress_max = graph.getVertices().size() + graph.getEdges().size();
 
     // Create the progress bar window
@@ -132,5 +211,35 @@ void MainWindow::on_load_graph_button_released()
     std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
     QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
     MessageBox::show("Elapsed time", str);
+}
+
+
+void MainWindow::on_clear_screen_button_released()
+{
+    // Get the first QGraphicsView object in the widget
+    QGraphicsView* graphicsView = ui->graphicsView;
+
+    // Clear the scene
+    graphicsView->scene()->clear();
+}
+
+void MainWindow::selectTool(std::string t) {
+    tool = t;
+}
+
+std::string MainWindow::getTool() {
+    return tool;
+}
+
+
+void MainWindow::on_tool_zoom_button_released()
+{
+    selectTool("zoom");
+}
+
+
+void MainWindow::on_tool_select_button_released()
+{
+    selectTool("select");
 }
 

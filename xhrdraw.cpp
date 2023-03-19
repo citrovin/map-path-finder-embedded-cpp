@@ -3,6 +3,30 @@
 
 #include <QPainter>
 #include <QGraphicsItem>
+#include <QVariant>
+
+class VertexEllipseItem : public QGraphicsEllipseItem
+{
+    public:
+        VertexEllipseItem(const QRectF& rect, QGraphicsItem* parent = nullptr) : QGraphicsEllipseItem(rect, parent) {
+                setAcceptHoverEvents(true);
+        }
+
+        // Override the hover events to change the color when hovering
+        void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
+        {
+//            setPen(QPen(Qt::green));
+//            setBrush(QBrush(Qt::green));
+            QGraphicsEllipseItem::hoverEnterEvent(event);
+        }
+
+        void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override
+        {
+//            setPen(QPen(Qt::red));
+//            setBrush(QBrush(Qt::red));
+            QGraphicsEllipseItem::hoverLeaveEvent(event);
+        }
+};
 
 void XHRDraw::drawCircle(QGraphicsView* view, int x, int y, double r, const QColor& color)
 {
@@ -54,6 +78,34 @@ void XHRDraw::drawCircleFast(QGraphicsView* view, int x, int y, double r, const 
     pixmapItem->setPos(view->mapToScene(0, 0));
 }
 
+void XHRDraw::drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id)
+{
+    // Get the scene associated with the graphics view
+    QGraphicsScene* scene = view->scene();
+
+    // Create a new ellipse item with the specified dimensions
+    VertexEllipseItem* ellipse = new VertexEllipseItem(QRectF(x - r/2, y - r/2, r, r));
+
+    // draw above lines
+    ellipse->setZValue(1);
+
+    // Set the pen color to red
+    QPen pen(color);
+    QBrush brush(color);
+    pen.setBrush(brush);
+    ellipse->setPen(pen);
+    ellipse->setBrush(brush);
+    ellipse->setData(0, id);
+
+    // select
+    ellipse->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    ellipse->setVisible(true);
+
+    // Add the ellipse item to the scene
+    scene->addItem(ellipse);
+}
+
+// this doesn't allow to display street names because we only have one path item, instead of all edge items, but it's faster
 void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* lines, QColor color, double thickness) {
     // get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
@@ -82,6 +134,7 @@ void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* li
     QPen pen(color);
     pen.setWidthF(thickness);
     path->setPen(pen);
+    path->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
     // add the path to the scene
     scene->addItem(path);
@@ -112,7 +165,7 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 //        std::cout<<scaledX<< " " << scaledY << std::endl;
 
         // draw vertex
-        XHRDraw::drawCircle(graphicsView, scaledX, scaledY, 0.2, Qt::red);
+        XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, verts[i].getId());
 //        std::cout << i << endl;
 //        if (progress/progressBarWindow->getMax())
 //        progressBarWindow->updateProgress(++progress);
