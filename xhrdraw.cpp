@@ -164,8 +164,10 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 
 //        std::cout<<scaledX<< " " << scaledY << std::endl;
 
+        int _id = verts[i].getId();
+        std::cout<<_id<<endl;
         // draw vertex
-        XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, verts[i].getId());
+        XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, QVariant(_id));
 //        std::cout << i << endl;
 //        if (progress/progressBarWindow->getMax())
 //        progressBarWindow->updateProgress(++progress);

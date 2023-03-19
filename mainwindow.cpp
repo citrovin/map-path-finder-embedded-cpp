@@ -100,7 +100,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 QGraphicsItem* closestItem = nullptr;
                 qreal minDistance = std::numeric_limits<qreal>::max();
 
-                std::cout<<"Min dist.: "<<minDistance<<std::endl;
+//                std::cout<<"Min dist.: "<<minDistance<<std::endl;
 
                 foreach (QGraphicsItem* item, graphicsView->scene()->items()) {
                     // Check if the item is selectable and visible
@@ -115,7 +115,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
                         // If the distance is smaller than the current minimum, update the closest item and distance
                         if (distance < minDistance) {
-                            std::cout<<"Found closest point with dist.: "<< distance <<std::endl;
+//                            std::cout<<"Found closest point with dist.: "<< distance <<std::endl;
                             closestItem = item;
                             minDistance = distance;
                         }
@@ -124,8 +124,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
                 if(closestItem != nullptr) {
                     selectedVertID = closestItem->data(0).toInt();
-
-                    closestItem->grabMouse();
 
                     // set color as selected vert
                     if (closestItem && closestItem->type() == QGraphicsEllipseItem::Type) {
@@ -148,6 +146,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     }
 
                     // update ui
+                    ui->lcd_selected_id->setDigitCount(6);
                     ui->lcd_selected_id->display(selectedVertID);
                     ui->lcd_selected_x->display(graph.getVertexById(selectedVertID).getX()/1000);
                     ui->lcd_selected_y->display(graph.getVertexById(selectedVertID).getY()/1000);
@@ -155,6 +154,26 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             }
 
             std::cout<<selectedVertID<<std::endl;
+        } else if( getTool() == "move") {
+            if (mouseEvent->button() == Qt::LeftButton) {
+
+            }
+        }
+
+        if(getTool() != "move") {
+            graphicsView->setDragMode(QGraphicsView::NoDrag);
+        } else {
+           graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+        }
+    }
+
+    if (event->type() == QEvent::MouseMove){
+        QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(event);
+
+        if( getTool() == "move") {
+            if (mouseEvent->buttons() & Qt::LeftButton) {
+
+            }
         }
     }
     return QMainWindow::eventFilter(obj, event);
@@ -241,5 +260,72 @@ void MainWindow::on_tool_zoom_button_released()
 void MainWindow::on_tool_select_button_released()
 {
     selectTool("select");
+}
+
+
+void MainWindow::on_set_start_button_released()
+{
+    ui->lcd_start_id->setDigitCount(6);
+    ui->lcd_start_id->display(selectedVertID);
+    // update ui
+    ui->lcd_start_x->display(graph.getVertexById(selectedVertID).getX()/1000);
+    ui->lcd_start_y->display(graph.getVertexById(selectedVertID).getY()/1000);
+}
+
+
+void MainWindow::on_set_end_button_released()
+{
+    ui->lcd_end_id->setDigitCount(6);
+    ui->lcd_end_id->display(selectedVertID);
+    // update ui
+    ui->lcd_end_x->display(graph.getVertexById(selectedVertID).getX()/1000);
+    ui->lcd_end_y->display(graph.getVertexById(selectedVertID).getY()/1000);
+}
+
+void MainWindow::setEndVert(int id) {
+    endVertID = id;
+}
+
+int MainWindow::getEndVert() {
+    return endVertID;
+}
+
+void MainWindow::setStartVert(int id) {
+    startVertID = id;
+}
+
+int MainWindow::getStartVert() {
+    return startVertID;
+}
+
+void MainWindow::on_util_flip_vertical_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+    // flip the viewport vertically
+    graphicsView->setTransform(QTransform(1, 0, 0, -1, 0, 0));
+}
+
+
+void MainWindow::on_util_flip_horizontal_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+    // flip the viewport horizontally
+    graphicsView->setTransform(QTransform(-1, 0, 0, 1, 0, 0));
+}
+
+
+void MainWindow::on_horizontalSlider_valueChanged(int value)
+{
+    // rotate the view
+    QGraphicsView* graphicsView = ui->graphicsView;
+    QTransform transform;
+    transform.rotate(value);
+    graphicsView->setTransform(transform);
+}
+
+
+void MainWindow::on_tool_move_button_released()
+{
+    selectTool("move");
 }
 
