@@ -20,3 +20,4 @@ src/*.o
 
 # qtapp build files
 build-qtapp-Desktop_Qt_6_4_3_MinGW_64_bit-Debug
+*.txt.user
