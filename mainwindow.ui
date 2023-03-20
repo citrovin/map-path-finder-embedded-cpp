@@ -39,8 +39,8 @@ color: rgb(0, 0, 0);</string>
      <rect>
       <x>630</x>
       <y>400</y>
-      <width>121</width>
-      <height>81</height>
+      <width>140</width>
+      <height>103</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -60,7 +60,20 @@ color: rgb(0, 0, 0);</string>
         <string notr="true">color: rgb(0, 0, 0);</string>
        </property>
        <property name="text">
-        <string>Load Graph</string>
+        <string>Load Graph Fast</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QPushButton" name="load_graph_button_2">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads all edge data as well&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Load Graph Full</string>
        </property>
       </widget>
      </item>

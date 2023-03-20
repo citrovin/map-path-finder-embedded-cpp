@@ -4,6 +4,8 @@
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QVariant>
+#include <QToolTip>
+#include <QGraphicsSceneMouseEvent>
 
 class VertexEllipseItem : public QGraphicsEllipseItem
 {
@@ -26,6 +28,36 @@ class VertexEllipseItem : public QGraphicsEllipseItem
 //            setBrush(QBrush(Qt::red));
             QGraphicsEllipseItem::hoverLeaveEvent(event);
         }
+};
+
+class EdgeLineItem : public QGraphicsLineItem
+{
+public:
+    EdgeLineItem(double x1, double y1, double x2, double y2, QGraphicsItem *parent = nullptr)
+        : QGraphicsLineItem(x1, y1, x2, y2, parent)
+    {
+        setAcceptHoverEvents(true);
+    }
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override
+    {
+        QGraphicsLineItem::mousePressEvent(event);
+        QToolTip::showText(event->screenPos(), toolTip());
+    }
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
+    {
+        setPen(QPen(Qt::green));
+        std::cout<<data(1).toString().toStdString()<<std::endl;
+        QGraphicsLineItem::hoverEnterEvent(event);
+    }
+
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override
+    {
+        setPen(QPen(Qt::black));
+        QGraphicsLineItem::hoverEnterEvent(event);
+    }
 };
 
 void XHRDraw::drawCircle(QGraphicsView* view, int x, int y, double r, const QColor& color)
@@ -140,6 +172,25 @@ void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* li
     scene->addItem(path);
 }
 
+void XHRDraw::drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int y2, QColor color, double thickness, QVariant id, QVariant street_name, QVariant length) {
+    // Get the scene associated with the graphics view
+    QGraphicsScene* scene = view->scene();
+
+    // Create a new line item
+    EdgeLineItem* line = new EdgeLineItem(x1,y1,x2,y2);
+
+    // set the pen color to the given color and thickness
+    QPen pen(color, thickness);
+    line->setPen(pen);
+    line->setData(0, id);
+    line->setData(1, street_name);
+//    std::cout<<street_name.toString().toStdString()<<std::endl;
+    line->setData(2, length);
+    line->setToolTip(street_name.toString());
+    // Add the line item to the scene
+    scene->addItem(line);
+}
+
 void XHRDraw::updateView(QGraphicsView* view) {
     view->update();
 }
@@ -191,4 +242,59 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 
     //draw lines
     XHRDraw::drawLine(graphicsView,&lines,Qt::black,0.2);
+}
+
+void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow, bool streetData) {
+    int progress = 0;
+
+    std::vector<std::vector<double>> lines;
+
+    // compute scale factors
+    double scaleX = viewWidth / (graph.getMaxX() - graph.getMinX());
+    double scaleY = viewHeight / (graph.getMaxY() - graph.getMinY());
+
+    auto verts = graph.getVertices();
+    auto edges = graph.getEdges();
+    // iterate through the vertices and edges of the graph and add them to the scene
+#pragma omp parallel for
+    for (int i = 0; i < verts.size(); ++i) {
+        // scale to screen size
+        double scaledX = std::round((verts[i].getX() - graph.getMinX()) * scaleX );
+        double scaledY = std::round((verts[i].getY() - graph.getMinY()) * scaleY );
+
+//        std::cout<<scaledX<< " " << scaledY << std::endl;
+
+        int _id = verts[i].getId();
+        std::cout<<_id<<endl;
+        // draw vertex
+        XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, QVariant(_id));
+//        std::cout << i << endl;
+//        if (progress/progressBarWindow->getMax())
+//        progressBarWindow->updateProgress(++progress);
+//        progress++;
+        // iterate through the adjacency list of the vertex and add edges to the scene
+        for (auto& adjacent_vertex_id : verts[i].getAdjacencyList()) {
+
+            // get coords
+            auto adjacent_vertex = graph.getVertexById(adjacent_vertex_id);
+
+            // scale to screen size
+            double scaledX2 = std::round((adjacent_vertex.getX() - graph.getMinX()) * scaleX );
+            double scaledY2 = std::round((adjacent_vertex.getY() - graph.getMinY()) * scaleY );
+
+            auto it = std::find_if(edges.begin(), edges.end(),
+                                   [&_id, &adjacent_vertex_id](const Edge& e) { return e.getSourceVid() == _id & e.getDestVid() == adjacent_vertex_id; });
+
+            if (it != edges.end()) {
+                XHRDraw::drawEdgeWithData(graphicsView,scaledX,scaledY,scaledX2,scaledY2,Qt::black,0.2,QVariant(it->getSourceVid()),QString::fromStdString(it->getName()),QVariant(it->getLength()));
+            } else {
+                std::cout<<"Did not find edge, are we sure this exists?"<<std::endl;
+            }
+//            progress++;
+//            progressBarWindow->updateProgress(++progress);
+        }
+    }
+
+    //draw lines
+
 }

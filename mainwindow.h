@@ -51,6 +51,10 @@ private slots:
 
     void on_util_reset_rotation_button_released();
 
+    void on_util_reset_zoom_button_released();
+
+    void on_load_graph_button_2_released();
+
 private:
     Ui::MainWindow *ui;
     std::string tool = "select";

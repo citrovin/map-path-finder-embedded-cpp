@@ -62,10 +62,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 
                 // Adjust the size of all shapes based on the new zoom level
-//                qreal newScale = qMax(transform.m11(), transform.m22());
-//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-//                    item->setScale(item->scale() * newScale / zoom);
-//                }
+                qreal newScale = qMax(transform.m11(), transform.m22());
+                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+                    item->setScale(item->scale() * newScale / zoom);
+                }
             }
             if (mouseEvent->button() == Qt::RightButton)
             {
@@ -84,10 +84,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 graphicsView->centerOn(point);
 
                 // Adjust the size of all shapes based on the new zoom level
-//                qreal newScale = qMax(transform.m11(), transform.m22());
-//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-//                    item->setScale(item->scale() * newScale / zoom);
-//                }
+                qreal newScale = qMax(transform.m11(), transform.m22());
+                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+                    item->setScale(item->scale() * newScale / zoom);
+                }
             }
         } else if (getTool() == "select"){
             if (mouseEvent->button() == Qt::LeftButton)
@@ -99,8 +99,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
 
                 // adjust the scene position based on the zoom factor
-                point.setX(point.x() / zoom);
-                point.setY(point.y() / zoom);
+//                point.setX(point.x() / zoom);
+//                point.setY(point.y() / zoom);
 
 
                 std::cout<<"Click at: "<<point.x()<< " " <<point.y()<<std::endl;
@@ -230,6 +230,7 @@ void MainWindow::on_load_graph_button_released()
     progressBarWindow.show();
 
     // start loading graph
+    // draw without street data
     XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow);
 
     // Hide the progress bar window when the operation is complete
@@ -348,5 +349,75 @@ void MainWindow::on_util_reset_rotation_button_released()
 
     // reset slider
     ui->horizontalSlider->setSliderPosition(0);
+}
+
+
+void MainWindow::on_util_reset_zoom_button_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+    QTransform transform;
+    transform.reset();
+//    transform.rotate(ui->horizontalSlider->sliderPosition());
+    graphicsView->setTransform(transform);
+
+    // reset slider
+    ui->horizontalSlider->setSliderPosition(0);
+}
+
+
+void MainWindow::on_load_graph_button_2_released()
+{
+    // Timing
+    QElapsedTimer timer;
+    timer.start();
+
+    // Get the graphics view from the UI
+    QGraphicsView* graphicsView = ui->graphicsView;
+
+    graphicsView->setToolTipDuration(1000);
+
+    // get bounds
+    int viewWidth = graphicsView->width();
+    int viewHeight = graphicsView->height();
+
+//    XHRDraw::drawCircle(graphicsView,150, 150, 50, Qt::blue);
+
+        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
+//        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\test_data.txt";
+//    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
+    // open the file
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        // error opening the file
+        QMessageBox::warning(nullptr, "Error", "Could not open file");
+    } else {
+        QMessageBox::information(nullptr, "Success", "Data file opened");
+    }
+
+    // create a Graph object
+//    Graph graph = loadGraph(fileName.toStdString());
+    Graph g(fileName.toStdString());
+    g.computeMercator();
+
+    graph = g;
+    int progress_max = graph.getVertices().size() + graph.getEdges().size();
+
+    // Create the progress bar window
+    ProgressBar progressBarWindow(nullptr, progress_max);
+
+    // Show the progress bar window
+    progressBarWindow.show();
+
+    // start loading graph
+    // draw with street data ~ 27x slower
+    XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow,true);
+
+    // Hide the progress bar window when the operation is complete
+    progressBarWindow.hide();
+
+    // Code to be timed
+    std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
+    QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
+    MessageBox::show("Elapsed time", str);
 }
 

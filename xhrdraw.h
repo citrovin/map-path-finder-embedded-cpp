@@ -17,6 +17,8 @@ public:
     static void updateView(QGraphicsView* view);
     static void drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow);
     static void drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id);
+    static void drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int y2, QColor color, double thickness, QVariant id, QVariant street_name, QVariant length);
+    static void drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow, bool streetData);
 };
 
 #endif // XHRDRAW_H
