@@ -10,6 +10,12 @@
     <height>664</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>1146</width>
+    <height>664</height>
+   </size>
+  </property>
   <property name="maximumSize">
    <size>
     <width>1146</width>
@@ -586,7 +592,7 @@ background-color: rgb(239, 239, 239);</string>
      <x>0</x>
      <y>0</y>
      <width>1146</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMPF">

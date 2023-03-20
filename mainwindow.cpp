@@ -3,6 +3,8 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QElapsedTimer>
+#include <QFileDialog>
+#include <QTextEdit>
 
 #include "progressbar.h"
 #include "xhrdraw.h"
@@ -190,10 +192,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::on_load_graph_button_released()
 {
-    // Timing
-    QElapsedTimer timer;
-    timer.start();
-
     // Get the graphics view from the UI
     QGraphicsView* graphicsView = ui->graphicsView;
 
@@ -203,7 +201,31 @@ void MainWindow::on_load_graph_button_released()
 
 //    XHRDraw::drawCircle(graphicsView,150, 150, 50, Qt::blue);
 
-        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
+    // create a file dialog to select the file to read
+    // TODO: ENABLE IN FINAL VERSION
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::currentPath());
+
+    // Timing
+    QElapsedTimer timer;
+    timer.start();
+//    // create a QTextEdit widget
+//    QTextEdit *textEdit = new QTextEdit();
+
+//    // set the text of the widget
+//    textEdit->setPlainText("Hello, world!");
+
+//    // show the widget
+//    textEdit->show();
+
+//    // read the file contents and set them to the QTextEdit widget
+//    QTextStream in(&file);
+//    QString text = in.readAll();
+//    textEdit->setPlainText(text);
+
+//    // close the file
+//    file.close();
+
+//        QString fileName = "data\\graph_dc_area.2022-03-11.txt";
 //        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\test_data.txt";
 //    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
     // open the file
@@ -240,6 +262,7 @@ void MainWindow::on_load_graph_button_released()
     std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
     QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
     MessageBox::show("Elapsed time", str);
+    file.close();
 }
 
 
@@ -367,9 +390,6 @@ void MainWindow::on_util_reset_zoom_button_released()
 
 void MainWindow::on_load_graph_button_2_released()
 {
-    // Timing
-    QElapsedTimer timer;
-    timer.start();
 
     // Get the graphics view from the UI
     QGraphicsView* graphicsView = ui->graphicsView;
@@ -382,7 +402,12 @@ void MainWindow::on_load_graph_button_2_released()
 
 //    XHRDraw::drawCircle(graphicsView,150, 150, 50, Qt::blue);
 
-        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::currentPath());
+
+    // Timing
+    QElapsedTimer timer;
+    timer.start();
+//        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
 //        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\test_data.txt";
 //    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
     // open the file
@@ -419,5 +444,7 @@ void MainWindow::on_load_graph_button_2_released()
     std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
     QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
     MessageBox::show("Elapsed time", str);
+
+    file.close();
 }
 

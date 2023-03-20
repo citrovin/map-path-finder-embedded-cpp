@@ -42,26 +42,7 @@ int main(int argc, char *argv[]) {
 
     // DEBUG --------- DISPLAY LOADED FILE
 
-    // create a file dialog to select the file to read
-    // TODO: ENABLE IN FINAL VERSION
-//    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::currentPath());
 
-//    // create a QTextEdit widget
-//    QTextEdit *textEdit = new QTextEdit();
-
-//    // set the text of the widget
-//    textEdit->setPlainText("Hello, world!");
-
-//    // show the widget
-//    textEdit->show();
-
-//    // read the file contents and set them to the QTextEdit widget
-//    QTextStream in(&file);
-//    QString text = in.readAll();
-//    textEdit->setPlainText(text);
-
-//    // close the file
-//    file.close();
 
 //    XHRDraw::drawCircle(graphicsView, 250, 250, 30, QColor::fromRgbF(1,1,1,1));
 //    XHRDraw::drawCircle(graphicsView, 150, 150, 90, QColor::fromRgbF(1,1,1,1));

@@ -48,14 +48,14 @@ protected:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
     {
-        setPen(QPen(Qt::green));
+        setPen(QPen(Qt::green,0.5));
         std::cout<<data(1).toString().toStdString()<<std::endl;
         QGraphicsLineItem::hoverEnterEvent(event);
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override
     {
-        setPen(QPen(Qt::black));
+        setPen(QPen(Qt::black,0.2));
         QGraphicsLineItem::hoverEnterEvent(event);
     }
 };
