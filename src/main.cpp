@@ -119,6 +119,14 @@ int main(int argc, char *argv[]){
         cout<<"\nFinished."<<endl;
         g.print_verteces();
     }
+    if(algorithm == "dijkstra") {
+        g.dijkstra(vstart, vend);
+    }
 
+<<<<<<< HEAD
+=======
+    // g.print_verteces();
+     // g.print_edges();
+>>>>>>> e9f0622 (DIJKSTRA done, still the return to be fixed)
     // g.summary();
 }
