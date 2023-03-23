@@ -124,9 +124,14 @@ int main(int argc, char *argv[]){
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     // g.print_verteces();
      // g.print_edges();
 >>>>>>> e9f0622 (DIJKSTRA done, still the return to be fixed)
+=======
+    //g.print_verteces();
+    // g.print_edges();
+>>>>>>> 3c5915f (dijkstra and bfs returning a vector now)
     // g.summary();
 }

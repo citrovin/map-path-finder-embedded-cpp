@@ -354,8 +354,22 @@ class Graph{
     double getMaxY() const {
         return maxY;
     }
+    void print_result(vector<uint32_t> path, vector<Edge> edges_crossed, int visited){
+        cout << "Number of vertices visited: " << visited << endl;
+        cout << "Number of vertex on path from start to end: " << path.size() << endl;
 
-    int bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
+        // Print out the path
+        double total_length = 0;
+        for (int i=0; i<path.size(); i++) {
+            cout << "Vertex[\t" << i << "] = " << path[i] 
+                 << ", length =\t" << total_length << endl;
+            total_length += edges_crossed[i].getLength();
+        }
+        
+        cout << endl;
+    }
+
+    vector<uint32_t> bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
     {
         deque<uint32_t> active_queue;
         set<uint32_t> closed_set;
@@ -363,7 +377,7 @@ class Graph{
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
-            return 0;
+            return {0}; 
         }
 
         // ID of the start vertex
@@ -409,28 +423,25 @@ class Graph{
         reverse(path.begin(), path.end());
         reverse(edges_crossed.begin(), edges_crossed.end());
 
-        cout << "Number of vertices visited: " << closed_set.size() << endl;
-        cout << "Number of vertex on path from start to end: " << path.size() << endl;
 
-        // Print out the path
-        double total_length = 0;
-        for (int i=0; i<path.size(); i++) {
-            cout << "Vertex[\t" << i << "] = " << path[i] 
-                 << ", length =\t" << total_length << endl;
-            total_length += edges_crossed[i].getLength();
-        }
-        
-        cout << endl;
-        return 1;
+        print_result(path, edges_crossed, closed_set.size());
+        return path;
     }
 
     double getEdgeWeight(uint32_t v1, uint32_t v2){
         return edge_weights[make_pair(v1,v2)].getLength();
     }
 
-    void dijkstra(uint32_t vstart, uint32_t vend) {
+    vector<uint32_t> dijkstra(uint32_t vstart, uint32_t vend) {
         std::deque<uint32_t> active_queue;
         std::set<uint32_t> closed_set;
+        
+        //checking if both are in the mapping first
+        if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
+            cout << "Error: values not in the map! " << endl;
+            return {0}; 
+        }
+
 
         for (auto it = mapping_.begin(); it != mapping_.end(); it++)
             {
@@ -497,18 +508,9 @@ class Graph{
         reverse(path.begin(), path.end());
         reverse(edges_crossed.begin(), edges_crossed.end());
 
-        cout << "Number of vertices visited: " << closed_set.size() << endl;
-        cout << "Number of vertex on path from start to end: " << path.size() << endl;
+        print_result(path, edges_crossed, closed_set.size());
+        return path;
 
-        // Print out the path
-        double total_length = 0;
-        for (int i=0; i<path.size(); i++) {
-            cout << "Vertex[\t" << i << "] = " << path[i] 
-                 << ", length =\t" << total_length << endl;
-            total_length += edges_crossed[i].getLength();
-        }
-        
-        cout << endl;
     }
 
     // vertices in the graph
