@@ -30,9 +30,10 @@ int main(int argc, char *argv[]){
 
     // set default options
     std::string file_name = "data/test_data.txt"; // file
-    int vstart = 1; // start node
-    int vend = 100; // end node
-    std::string algorithm = "bfs"; // algorithm used
+    int vstart = 2; // start node
+    int vend = 500; // end node
+    std::string algorithm = "none"; // algorithm used
+    bool print_vertices = false, print_edges = false, save_to_file = false, load_display_debug = false;
 
     // ignore other args if display is present
     if(ap.cmdOptionExists("--display")) {
@@ -69,6 +70,22 @@ int main(int argc, char *argv[]){
     if(ap.cmdOptionExists("--algorithm")) {
         algorithm = ap.getCmdOption("--algorithm");
     }
+    
+    if(ap.cmdOptionExists("--vertices")) {
+        print_vertices = true;
+    }
+
+    if(ap.cmdOptionExists("--edges")) {
+        print_edges = true;
+    }
+
+    if(ap.cmdOptionExists("--save")) {
+        save_to_file = true;
+    }
+
+    if(ap.cmdOptionExists("--display-debug")){
+        load_display_debug = true;
+    }
 
     // resume main execution path
     file_name = file_name.c_str();
@@ -77,9 +94,31 @@ int main(int argc, char *argv[]){
     // TODO: more algos
     if(algorithm == "bfs") {
         g.bfs(vstart, vend);
+    } else {
+        cout << "Not running a search algorithm." << endl;
     }
 
-    // g.print_verteces();
-    // g.print_edges();
+    if(print_vertices) {
+        g.print_verteces();
+    }
+
+    if(print_edges) {
+        g.print_edges();
+    }
+
+    if(save_to_file) {
+        cout<<"\nStarting mercator computations... ";
+        g.computeMercator();
+        g.saveToFileForDisplay("data/display.txt");
+        cout<<"finished."<<endl;
+    }
+
+    if(load_display_debug) {
+        cout<<"DEBUG - Loading file for display..."<<endl;
+        g.loadFromFileForDisplay("data/display.txt");
+        cout<<"\nFinished."<<endl;
+        g.print_verteces();
+    }
+
     // g.summary();
 }
