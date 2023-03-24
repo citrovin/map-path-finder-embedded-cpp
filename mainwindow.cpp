@@ -303,6 +303,7 @@ void MainWindow::on_set_start_button_released()
     // update ui
     ui->lcd_start_x->display(graph.getVertexById(selectedVertID).getX()/1000);
     ui->lcd_start_y->display(graph.getVertexById(selectedVertID).getY()/1000);
+    setStartVert(selectedVertID);
 }
 
 
@@ -313,6 +314,7 @@ void MainWindow::on_set_end_button_released()
     // update ui
     ui->lcd_end_x->display(graph.getVertexById(selectedVertID).getX()/1000);
     ui->lcd_end_y->display(graph.getVertexById(selectedVertID).getY()/1000);
+    setEndVert(selectedVertID);
 }
 
 void MainWindow::setEndVert(int id) {
@@ -446,5 +448,29 @@ void MainWindow::on_load_graph_button_2_released()
     MessageBox::show("Elapsed time", str);
 
     file.close();
+}
+
+
+void MainWindow::on_algo_bfs_button_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+    // get bounds
+    int viewWidth = graphicsView->width();
+    int viewHeight = graphicsView->height();
+    std::cout<<startVertID<< " "<< endVertID<<std::endl;
+    std::vector<Vertex> nav_path = graph.bfs(startVertID,endVertID);
+    XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+}
+
+
+void MainWindow::on_algo_djikstra_button_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+    // get bounds
+    int viewWidth = graphicsView->width();
+    int viewHeight = graphicsView->height();
+    std::cout<<startVertID<< " "<< endVertID<<std::endl;
+    std::vector<Vertex> nav_path = graph.dijkstra(startVertID,endVertID);
+    XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
 }
 

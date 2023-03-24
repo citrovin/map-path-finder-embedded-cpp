@@ -196,6 +196,7 @@ void XHRDraw::updateView(QGraphicsView* view) {
 }
 
 
+// TODO: remove scaling from first draw of graph
 void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow) {
     int progress = 0;
 
@@ -295,6 +296,29 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
         }
     }
 
-    //draw lines
+   //draw lines
+
+}
+
+void XHRDraw::drawNavPath(QGraphicsView* g,std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight) {
+
+    // compute scale factors
+    double scaleX = viewWidth / (graph_n.getMaxX() - graph_n.getMinX());
+    double scaleY = viewHeight / (graph_n.getMaxY() - graph_n.getMinY());
+
+    auto verts = graph_n.getVertices();
+    auto edges = graph_n.getEdges();
+
+#pragma omp parallel for
+    for (int i = 0; i < v.size(); ++i) {
+        // scale to screen size
+        double scaledX = std::round((v[i].getX() - graph_n.getMinX()) * scaleX );
+        double scaledY = std::round((v[i].getY() - graph_n.getMinY()) * scaleY );
+
+        int _id = v[i].getId();
+    //        std::cout<<_id<<endl;
+        // draw vertex
+        XHRDraw::drawVertexWithData(g, scaledX, scaledY, 0.5, Qt::green, QVariant(_id));
+    }
 
 }

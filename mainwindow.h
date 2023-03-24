@@ -55,6 +55,10 @@ private slots:
 
     void on_load_graph_button_2_released();
 
+    void on_algo_bfs_button_released();
+
+    void on_algo_djikstra_button_released();
+
 private:
     Ui::MainWindow *ui;
     std::string tool = "select";
