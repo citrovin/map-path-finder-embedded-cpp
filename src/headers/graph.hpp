@@ -9,16 +9,18 @@
 #include <vector>
 #include <set>
 #include <queue>
+#include <iomanip>
 #include <map>
 #include <cmath>
 #include <iomanip>
 #include <limits>
+#include <cmath>
 
 using namespace std; //to be removed in the end
 
 class Vertex{ //change to protected and use fucntions to access
     public:
-        Vertex(){};
+        Vertex() : id_(0), longitude_(0), latitude_(0){}
         Vertex(int id, double longitude, double latitude){
             id_ = id;
             longitude_ = longitude;
@@ -44,6 +46,13 @@ class Vertex{ //change to protected and use fucntions to access
         double getY() const {
             return y;
         }
+        int getParent() {
+            return parent_;
+        }
+        double getWeight() {
+            return weigth_;
+        }
+
         const vector<int>& getAdjacencyList() const { 
             return adjacency_list_; 
         }
@@ -62,6 +71,12 @@ class Vertex{ //change to protected and use fucntions to access
         }
         void setLatitude(double latitude) { 
             latitude_ = latitude; 
+        }
+        void setParent(int parent) {
+            parent_= parent;
+        }        
+        void setWeight(float weigth) {
+            weigth_= weigth;
         }
         void appendAdjacencyList(int i) {
             adjacency_list_.emplace_back(i);
@@ -88,11 +103,14 @@ class Vertex{ //change to protected and use fucntions to access
         double latitude_;
         double x;
         double y;
+        int parent_; //only used in the cases of path tracing (good idea to have it here or not?)
+        double weigth_;
         vector<int> adjacency_list_;
 };
 
 class Edge{
     public:
+        Edge() : source_vid_(0), dest_vid_(0), length_(0), name_("") {} //default constructor
         Edge(int source_vid, int dest_vid, double length, string name){
             source_vid_ =source_vid;
             dest_vid_ = dest_vid;
@@ -150,10 +168,11 @@ class Edge{
 
 class Graph{
     private:
-        //vector<Vertex> verteces_;
-        vector<Edge> edges_; //do we need this? - christian says yes
+        
+        vector<Edge> edges_; //do we need this? - christian says yes -> No use only the mapping!! rember filippo remove this!!
         map<int, Vertex> mapping_; //we can switch to unordered
-
+        map<pair<uint32_t, uint32_t>, Edge> edge_weights;
+        
         // earth radius
         int R = 6371009;
         double l0 = 0;
@@ -261,17 +280,25 @@ class Graph{
                 dest_vid = stoi(line.substr(0, line.find(',')));
                 line.erase(0, line.find(',')+1);
 
-                length = stod(line.substr(0, line.find(',')));
+                try {
+                    length = stod(line.substr(0, line.find(',')));
+                }catch(invalid_argument) {
+                    //to be converted in mercator!!
+                        double lats = (mapping_[source_vid].getLatitude()-mapping_[dest_vid].getLatitude());
+                        double longs = (mapping_[source_vid].getLongitude()-mapping_[dest_vid].getLongitude());
+                        length = sqrt(lats*lats+longs*longs);
+                }
                 line.erase(0, line.find(',')+1);
 
                 name = line.substr(0, line.find(','));
                 line.erase(0, line.find(',')+1);
 
-                Edge edge = Edge(source_vid, dest_vid, length, name);
+                Edge edge(source_vid, dest_vid, length, name);
 
                 edges_.emplace_back(edge);
 
                 mapping_[source_vid].appendAdjacencyList(dest_vid);
+                edge_weights.insert(make_pair(make_pair(source_vid, dest_vid),edge));
             }
             
             
@@ -327,51 +354,175 @@ class Graph{
     double getMaxY() const {
         return maxY;
     }
+    void print_result(vector<uint32_t> path, vector<Edge> edges_crossed, int visited){
+        cout << "Number of vertices visited: " << visited << endl;
+        cout << "Number of vertex on path from start to end: " << path.size() << endl;
 
-    void bfs(uint32_t vstart, uint32_t vend) 
-{
-    deque<uint32_t> active_queue; //maybe deque better?
-    set<uint32_t> closed_set;
-    
-    uint32_t vertex_count = 0;
-
-    // ID of the start vertex
-    active_queue.push_back(vstart);
-
-    while (!active_queue.empty()) {
-        // from the current vertex in the front of the queue
-        // compute all vertices reachable in 1 step
-        uint32_t vcurrent = active_queue.front();
-        active_queue.pop_front();
-
-        closed_set.insert(vcurrent);
-        vertex_count++;
-
-        if (vcurrent == vend) {
-            break;
+        // Print out the path
+        double total_length = 0;
+        for (int i=0; i<path.size(); i++) {
+            cout << "Vertex[\t" << i << "] = " << path[i] 
+                 << ", length =\t" << total_length << endl;
+            total_length += edges_crossed[i].getLength();
         }
+        
+        cout << endl;
+    }
+
+    vector<Vertex> bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
+    {
+        deque<uint32_t> active_queue;
+        set<uint32_t> closed_set;
+        
+        //checking if both are in the mapping first
+        if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
+            cout << "Error: values not in the map! " << endl;
+            return {Vertex()}; 
+        }
+
+        // ID of the start vertex
+        active_queue.push_back(vstart);
+
+        while (!active_queue.empty()) {
+            // from the current vertex in the front of the queue
+            // compute all vertices reachable in 1 step
+            uint32_t vcurrent = active_queue.front();
+            active_queue.pop_front();
+
+            closed_set.insert(vcurrent);
+
+
+            if (vcurrent == vend) {
+                break;
+            }
 
         for (auto& vnext : mapping_[vcurrent].getAdjacencyList()) {
 
-            if (closed_set.find(vnext) != closed_set.end()){
-                continue;
-            }
-               
-            if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
-                active_queue.push_back(vnext);
+                if (closed_set.find(vnext) != closed_set.end()){
+                    continue;
+                }
+                
+                if (find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
+                    active_queue.push_back(vnext);
+                    mapping_[vnext].setParent(vcurrent); // Set parent for vnext (can be overwritten but is fine)
+                }
             }
         }
+   
+        vector<uint32_t> path;
+        vector<Edge> edges_crossed;
+        uint32_t v = vend;
+        while (v != vstart) {       
+            int vOld = v;
+            path.push_back(v);
+            v = mapping_[v].getParent();
+            edges_crossed.push_back(edge_weights[make_pair(v,vOld)]);
+        }
+
+        path.push_back(vstart);
+        reverse(path.begin(), path.end());
+        reverse(edges_crossed.begin(), edges_crossed.end());
+
+        print_result(path, edges_crossed, closed_set.size());
+
+        //already converting here to have it directly
+        vector<Vertex> result;
+        for (auto id : path){
+            result.push_back(mapping_[id]);
+        }
+        return result;
     }
 
-    //printing result ...
-    cout << "\nPRINTING BFS..\n";
-    for (const auto& el : closed_set) {
-        auto ver = mapping_[el];
-        ver.print_vertex();
+    double getEdgeWeight(uint32_t v1, uint32_t v2){
+        return edge_weights[make_pair(v1,v2)].getLength();
     }
 
-    cout << "Number of vertices visited: " << vertex_count << endl;
-}
+    vector<Vertex> dijkstra(uint32_t vstart, uint32_t vend) {
+        std::deque<uint32_t> active_queue;
+        std::set<uint32_t> closed_set;
+        
+        //checking if both are in the mapping first
+        if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
+            cout << "Error: values not in the map! " << endl;
+            return {Vertex()}; 
+        }
+
+
+        for (auto it = mapping_.begin(); it != mapping_.end(); it++)
+            {
+                it->second.setWeight(std::numeric_limits<double>::max());
+            }
+
+        // Set the weight of the start vertex to 0
+        mapping_[vstart].setWeight(0);
+
+        active_queue.push_back(vstart);
+
+        do {
+            // Get the current vertex from the front of the queue
+            auto vcurrent = active_queue.front();
+            active_queue.pop_front();
+
+            // Stop if we have reached the end vertex
+            if (vcurrent == vend) {
+                break;
+            }
+
+            // Add the current vertex to the closed set
+            closed_set.insert(vcurrent);
+
+            // For each neighbor of the current vertex
+            for (auto vnext : mapping_[vcurrent].getAdjacencyList()) {
+                // Skip if the neighbor is already in the closed set
+                if (closed_set.find(vnext) != closed_set.end()) {
+                    continue;
+                }
+
+                // Calculate the weight of the neighbor
+                auto w = mapping_[vcurrent].getWeight() + getEdgeWeight(vcurrent, vnext);
+
+                // If the neighbor is not in the active queue, add it
+                if (std::find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
+                    mapping_[vnext].setWeight(w);
+                    mapping_[vnext].setParent(vcurrent);
+                    active_queue.push_back(vnext);
+                }
+                // If the weight of the neighbor is less than the current weight, update it
+                else if (w < mapping_[vnext].getWeight()) {
+                    mapping_[vnext].setWeight(w);
+                    mapping_[vnext].setParent(vcurrent);
+                }
+            }
+
+            // Sort the active queue based on the weights of the vertices
+            std::sort(active_queue.begin(), active_queue.end(),
+                [&](uint32_t v1, uint32_t v2) { return mapping_[v1].getWeight() < mapping_[v2].getWeight(); });
+        } while (!active_queue.empty());
+
+        vector<uint32_t> path;
+        vector<Edge> edges_crossed;
+        uint32_t v = vend;
+        while (v != vstart) {       
+            int vOld = v;
+            path.push_back(v);
+            v = mapping_[v].getParent();
+            edges_crossed.push_back(edge_weights[make_pair(v,vOld)]);
+        }
+
+        path.push_back(vstart);
+        reverse(path.begin(), path.end());
+        reverse(edges_crossed.begin(), edges_crossed.end());
+
+        print_result(path, edges_crossed, closed_set.size());
+
+        vector<Vertex> result;
+        for (auto id : path){
+            result.push_back(mapping_[id]);
+        }
+        return result;
+
+    }
+
 
     void const summary(){
         cout << "\nSummary of Graph:\n"

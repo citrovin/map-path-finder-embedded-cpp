@@ -94,7 +94,9 @@ int main(int argc, char *argv[]){
     // TODO: more algos
     if(algorithm == "bfs") {
         g.bfs(vstart, vend);
-    } else {
+    } else if(algorithm == "dijkstra") {
+        g.dijkstra(vstart, vend);
+    }else{
         cout << "Not running a search algorithm." << endl;
     }
 
@@ -120,5 +122,6 @@ int main(int argc, char *argv[]){
         g.print_verteces();
     }
 
-    // g.summary();
+
+
 }
