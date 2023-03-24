@@ -523,23 +523,6 @@ class Graph{
 
     }
 
-    // vertices in the graph
-    vector<Vertex> getVertices() const {
-        vector<Vertex> vertices;
-        for (const auto& p : mapping_) {
-            vertices.push_back(p.second);
-        }
-        return vertices;
-    }
-
-    // adjacency list of a vertex given its ID
-    vector<int> getAdjacencyList(int id) const {
-        auto it = mapping_.find(id);
-        if (it != mapping_.end()) {
-            return it->second.getAdjacencyList();
-        }
-        throw invalid_argument("Vertex not found");
-    }
 
     void const summary(){
         cout << "\nSummary of Graph:\n"
