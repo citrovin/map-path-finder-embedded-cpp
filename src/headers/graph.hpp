@@ -20,7 +20,7 @@ using namespace std; //to be removed in the end
 
 class Vertex{ //change to protected and use fucntions to access
     public:
-        Vertex(){};
+        Vertex() : id_(0), longitude_(0), latitude_(0){}
         Vertex(int id, double longitude, double latitude){
             id_ = id;
             longitude_ = longitude;
@@ -369,7 +369,7 @@ class Graph{
         cout << endl;
     }
 
-    vector<uint32_t> bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
+    vector<Vertex> bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
     {
         deque<uint32_t> active_queue;
         set<uint32_t> closed_set;
@@ -377,7 +377,7 @@ class Graph{
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
-            return {0}; 
+            return {Vertex()}; 
         }
 
         // ID of the start vertex
@@ -423,23 +423,28 @@ class Graph{
         reverse(path.begin(), path.end());
         reverse(edges_crossed.begin(), edges_crossed.end());
 
-
         print_result(path, edges_crossed, closed_set.size());
-        return path;
+
+        //already converting here to have it directly
+        vector<Vertex> result;
+        for (auto id : path){
+            result.push_back(mapping_[id]);
+        }
+        return result;
     }
 
     double getEdgeWeight(uint32_t v1, uint32_t v2){
         return edge_weights[make_pair(v1,v2)].getLength();
     }
 
-    vector<uint32_t> dijkstra(uint32_t vstart, uint32_t vend) {
+    vector<Vertex> dijkstra(uint32_t vstart, uint32_t vend) {
         std::deque<uint32_t> active_queue;
         std::set<uint32_t> closed_set;
         
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
-            return {0}; 
+            return {Vertex()}; 
         }
 
 
@@ -509,7 +514,12 @@ class Graph{
         reverse(edges_crossed.begin(), edges_crossed.end());
 
         print_result(path, edges_crossed, closed_set.size());
-        return path;
+
+        vector<Vertex> result;
+        for (auto id : path){
+            result.push_back(mapping_[id]);
+        }
+        return result;
 
     }
 
