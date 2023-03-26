@@ -59,6 +59,8 @@ private slots:
 
     void on_algo_djikstra_button_released();
 
+    void on_algo_astar_button_released();
+
 private:
     Ui::MainWindow *ui;
     std::string tool = "select";

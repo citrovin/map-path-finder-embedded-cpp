@@ -474,3 +474,14 @@ void MainWindow::on_algo_djikstra_button_released()
     XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
 }
 
+void MainWindow::on_algo_astar_button_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+    // get bounds
+    int viewWidth = graphicsView->width();
+    int viewHeight = graphicsView->height();
+    std::cout<<startVertID<< " "<< endVertID<<std::endl;
+    std::vector<Vertex> nav_path = graph.astar(startVertID,endVertID);
+    XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+}
+
