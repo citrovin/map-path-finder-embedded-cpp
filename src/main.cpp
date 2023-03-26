@@ -96,7 +96,10 @@ int main(int argc, char *argv[]){
         g.bfs(vstart, vend);
     } else if(algorithm == "dijkstra") {
         g.dijkstra(vstart, vend);
-    }else{
+    } else if(algorithm == "astar"){
+        g.astar(vstart, vend);
+    }
+    else {
         cout << "Not running a search algorithm." << endl;
     }
 

@@ -55,6 +55,9 @@ class Vertex{ //change to protected and use fucntions to access
         double getWeight() {
             return weigth_;
         }
+        double getEstimate(){
+            return estimate_;
+        }
 
         const vector<int>& getAdjacencyList() const { 
             return adjacency_list_; 
@@ -80,6 +83,9 @@ class Vertex{ //change to protected and use fucntions to access
         }        
         void setWeight(float weigth) {
             weigth_= weigth;
+        }
+        void setEstimate(float estimate) {
+            estimate_ = estimate;
         }
         void appendAdjacencyList(int i) {
             adjacency_list_.emplace_back(i);
@@ -108,6 +114,7 @@ class Vertex{ //change to protected and use fucntions to access
         double y;
         int parent_; //only used in the cases of path tracing (good idea to have it here or not?)
         double weigth_;
+        double estimate_;
         vector<int> adjacency_list_;
 };
 
@@ -177,12 +184,11 @@ class Graph{
         map<pair<uint32_t, uint32_t>, Edge> edge_weights;
         double mean_lat;
         double mean_lon;
-        
+
         // earth radius
         int R = 6371009;
         double l0 = 0;
 
-        
         double computeLongitudinalCenter() {
             double sum = 0.0;
             int num = 0;
@@ -416,6 +422,18 @@ class Graph{
         cout << endl;
     }
 
+
+    // heuristik estimator for the astar algorithm
+    double heuristic_distance_estimator(uint32_t source_vid, uint32_t dest_vid) {
+        // heuristik: euklidean distance
+        double x1 = FcomputeMercatorX(mapping_[dest_vid].getLongitude());
+        double y1 = FcomputeMercatorY(mapping_[dest_vid].getLatitude());
+        double x2 = FcomputeMercatorX(mapping_[source_vid].getLongitude());
+        double y2 = FcomputeMercatorY(mapping_[source_vid].getLatitude());
+
+        return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+    }
+
     vector<Vertex> bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
     {
         deque<uint32_t> active_queue;
@@ -544,6 +562,98 @@ class Graph{
             // Sort the active queue based on the weights of the vertices
             std::sort(active_queue.begin(), active_queue.end(),
                 [&](uint32_t v1, uint32_t v2) { return mapping_[v1].getWeight() < mapping_[v2].getWeight(); });
+        } while (!active_queue.empty());
+
+        vector<uint32_t> path;
+        vector<Edge> edges_crossed;
+        uint32_t v = vend;
+        while (v != vstart) {       
+            int vOld = v;
+            path.push_back(v);
+            v = mapping_[v].getParent();
+            edges_crossed.push_back(edge_weights[make_pair(v,vOld)]);
+        }
+
+        path.push_back(vstart);
+        reverse(path.begin(), path.end());
+        reverse(edges_crossed.begin(), edges_crossed.end());
+
+        print_result(path, edges_crossed, closed_set.size());
+
+        vector<Vertex> result;
+        for (auto id : path){
+            result.push_back(mapping_[id]);
+        }
+        return result;
+
+    }
+
+
+    vector<Vertex> astar(uint32_t vstart, uint32_t vend) {
+        std::deque<uint32_t> active_queue;
+        std::set<uint32_t> closed_set;
+
+        std::cout << "A*-Algorithm" <<endl;
+
+        //checking if both are in the mapping first
+        if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
+            cout << "Error: values not in the map! " << endl;
+            return {Vertex()}; 
+        }
+
+
+        for (auto it = mapping_.begin(); it != mapping_.end(); it++)
+            {
+                it->second.setWeight(std::numeric_limits<double>::max());
+            }
+
+        // Set the weight of the start vertex to 0
+        mapping_[vstart].setWeight(0);
+
+
+        active_queue.push_back(vstart);
+
+        do {
+            // Get the current vertex from the front of the queue
+            auto vcurrent = active_queue.front();
+            active_queue.pop_front();
+
+            // Stop if we have reached the end vertex
+            if (vcurrent == vend) {
+                break;
+            }
+
+            // Add the current vertex to the closed set
+            closed_set.insert(vcurrent);
+
+            // For each neighbor of the current vertex
+            for (auto vnext : mapping_[vcurrent].getAdjacencyList()) {
+                // Skip if the neighbor is already in the closed set
+                if (closed_set.find(vnext) != closed_set.end()) {
+                    continue;
+                }
+
+                // Calculate the weight of the neighbor
+                auto g = mapping_[vcurrent].getWeight() + getEdgeWeight(vcurrent, vnext);
+                auto f = g + heuristic_distance_estimator(vnext, vend);
+                // If the neighbor is not in the active queue, add it
+                if (std::find(active_queue.begin(), active_queue.end(), vnext) == active_queue.end()) {
+                    mapping_[vnext].setWeight(g);
+                    mapping_[vnext].setEstimate(f);
+                    mapping_[vnext].setParent(vcurrent);
+                    active_queue.push_back(vnext);
+                }
+                // If the estimator of the neighbor is less than the current estimator, update it
+                else if (f < mapping_[vnext].getEstimate()) {
+                    mapping_[vnext].setWeight(g);
+                    mapping_[vnext].setEstimate(f);
+                    mapping_[vnext].setParent(vcurrent);
+                }
+            }
+
+            // Sort the active queue based on the weights of the vertices
+            std::sort(active_queue.begin(), active_queue.end(),
+                [&](uint32_t v1, uint32_t v2) { return mapping_[v1].getEstimate() < mapping_[v2].getEstimate(); });
         } while (!active_queue.empty());
 
         vector<uint32_t> path;
