@@ -16,6 +16,9 @@
 #include <limits>
 #include <cmath>
 
+// earth radius
+#define R0 6378137.0
+
 using namespace std; //to be removed in the end
 
 class Vertex{ //change to protected and use fucntions to access
@@ -172,12 +175,14 @@ class Graph{
         vector<Edge> edges_; //do we need this? - christian says yes -> No use only the mapping!! rember filippo remove this!!
         map<int, Vertex> mapping_; //we can switch to unordered
         map<pair<uint32_t, uint32_t>, Edge> edge_weights;
+        double mean_lat;
+        double mean_lon;
         
         // earth radius
         int R = 6371009;
         double l0 = 0;
 
-        // compute longitudinal center
+        
         double computeLongitudinalCenter() {
             double sum = 0.0;
             int num = 0;
@@ -188,15 +193,41 @@ class Graph{
             return sum / num;
         }
 
+        double computeLatitudinalCenter() {
+            double sum = 0.0;
+            int num = 0;
+            for (const auto& vertex : getVertices()) {
+                sum += vertex.getLatitude();
+                num++;
+            }
+            return sum / num;
+        }
+
         // compute mercator x
         double computeMercatorX(double longitude) {
             return R * (longitude - l0);
         }
-
+        
         // compute mercator y
         double computeMercatorY(double latitude) {
             return R * log(tan(M_PI/4 + latitude/2));
         }
+
+        double degreesToRadians(double degrees) {
+            return degrees * M_PI / 180.0;
+        }
+        double FcomputeMercatorX(double lon) {
+            double lon_center_rad = degreesToRadians(getMeanLon());
+            double lat_center_rad = degreesToRadians(getMeanLat());
+            double x = R0 * cos(lat_center_rad) * (degreesToRadians(lon)-lon_center_rad);
+            return x;
+        }
+        double FcomputeMercatorY(double lat) {
+            double lat_center_rad = degreesToRadians(getMeanLat());
+            double y = R0 * log(tan(((degreesToRadians(lat)-lat_center_rad)/2) + (M_PI/4)));
+            return y;
+        }
+
 
         // min and max
         double maxX, maxY, minX, minY;
@@ -235,6 +266,8 @@ class Graph{
         ifstream file_stream;
         file_stream.open(file_name, ios::in);
         string line;
+        double sum_lat=0;
+        double sum_long=0;
 
         // graph loading
         while (getline(file_stream, line)) {
@@ -262,9 +295,15 @@ class Graph{
 
                 Vertex vertex = Vertex(id, longitude, lattitude);
                 mapping_.emplace(id, vertex);     //or insert?
+
+                sum_lat += lattitude;
+                sum_long += longitude;
+                mean_lat = sum_lat/mapping_.size();
+                mean_lon = sum_long/mapping_.size();
+
+                
             }
 
-            
             if(line[0]=='E'){
                 // load edges
                 string name;
@@ -283,10 +322,11 @@ class Graph{
                 try {
                     length = stod(line.substr(0, line.find(',')));
                 }catch(invalid_argument) {
-                    //to be converted in mercator!!
-                        double lats = (mapping_[source_vid].getLatitude()-mapping_[dest_vid].getLatitude());
-                        double longs = (mapping_[source_vid].getLongitude()-mapping_[dest_vid].getLongitude());
-                        length = sqrt(lats*lats+longs*longs);
+                        double x1 = FcomputeMercatorX(mapping_[dest_vid].getLongitude());
+                        double y1 = FcomputeMercatorY(mapping_[dest_vid].getLatitude());
+                        double x2 = FcomputeMercatorX(mapping_[source_vid].getLongitude());
+                        double y2 = FcomputeMercatorY(mapping_[source_vid].getLatitude());
+                        length = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
                 }
                 line.erase(0, line.find(',')+1);
 
@@ -303,10 +343,17 @@ class Graph{
             
             
         }
-
+            
         file_stream.close(); // dalim you never closed your file stream :)
     }
 
+    double getMeanLat(){
+        return mean_lat;
+    }
+
+    double getMeanLon(){
+        return mean_lon;
+    }
     // vertices in the graph
     vector<Vertex> getVertices() const {
         vector<Vertex> vertices;
@@ -361,7 +408,7 @@ class Graph{
         // Print out the path
         double total_length = 0;
         for (int i=0; i<path.size(); i++) {
-            cout << "Vertex[\t" << i << "] = " << path[i] 
+            cout << "Vertex[\t" << i+1 << "] = " << path[i] 
                  << ", length =\t" << total_length << endl;
             total_length += edges_crossed[i].getLength();
         }
