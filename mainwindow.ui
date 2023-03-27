@@ -45,7 +45,7 @@ color: rgb(0, 0, 0);</string>
      <rect>
       <x>630</x>
       <y>400</y>
-      <width>140</width>
+      <width>121</width>
       <height>103</height>
      </rect>
     </property>
@@ -335,9 +335,9 @@ color: rgb(0, 0, 0);</string>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>960</x>
-      <y>220</y>
-      <width>140</width>
+      <x>949</x>
+      <y>200</y>
+      <width>181</width>
       <height>171</height>
      </rect>
     </property>
@@ -435,9 +435,9 @@ color: rgb(0, 0, 0);</string>
    <widget class="QWidget" name="gridLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>930</x>
-      <y>410</y>
-      <width>191</width>
+      <x>950</x>
+      <y>390</y>
+      <width>181</width>
       <height>80</height>
      </rect>
     </property>
@@ -452,6 +452,12 @@ color: rgb(0, 0, 0);</string>
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="QLCDNumber" name="algo_distance_lcd"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLCDNumber" name="algo_visited_lcd"/>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_16">
        <property name="styleSheet">
@@ -461,12 +467,6 @@ color: rgb(0, 0, 0);</string>
         <string>Distance:</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLCDNumber" name="lcdNumber_4"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLCDNumber" name="lcdNumber_5"/>
      </item>
     </layout>
    </widget>
@@ -580,6 +580,41 @@ background-color: rgb(239, 239, 239);</string>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>200</y>
+      <width>160</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <item>
+      <widget class="QLabel" name="label_19">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Path Utils</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="clear_path_button">
+       <property name="text">
+        <string>Clear Path</string>
        </property>
       </widget>
      </item>

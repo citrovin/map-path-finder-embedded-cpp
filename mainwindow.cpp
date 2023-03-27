@@ -272,7 +272,7 @@ void MainWindow::on_clear_screen_button_released()
     QGraphicsView* graphicsView = ui->graphicsView;
 
     // clear the scene
-    graphicsView->scene()->clear();
+    XHRDraw::clearItems(graphicsView);
 }
 
 void MainWindow::selectTool(std::string t) {
@@ -489,5 +489,13 @@ void MainWindow::on_algo_astar_button_released()
     std::cout<<startVertID<< " "<< endVertID<<std::endl;
     std::vector<Vertex> nav_path = graph.astar(startVertID,endVertID).first;
     XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+}
+
+
+void MainWindow::on_clear_path_button_released()
+{
+    QGraphicsView* graphicsView = ui->graphicsView;
+
+    XHRDraw::clearItems(graphicsView,"nav");
 }
 
