@@ -593,7 +593,7 @@ class Graph{
     }
 
 
-    vector<Vertex> astar(uint32_t vstart, uint32_t vend) {
+    pair<vector<Vertex>, vector<Vertex>> astar(uint32_t vstart, uint32_t vend) {
         std::deque<uint32_t> active_queue;
         std::set<uint32_t> closed_set;
 
@@ -602,7 +602,6 @@ class Graph{
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
-            return {Vertex()}; 
         }
 
 
@@ -676,11 +675,15 @@ class Graph{
 
         print_result(path, edges_crossed, closed_set.size());
 
-        vector<Vertex> result;
+        vector<Vertex> resultPath;
+        vector<Vertex> resultSet;
         for (auto id : path){
-            result.push_back(mapping_[id]);
+            resultPath.push_back(mapping_[id]);
         }
-        return result;
+        for (auto id : closed_set){
+            resultSet.push_back(mapping_[id]);
+        }
+        return make_pair(resultPath, resultSet);
 
     }
 
