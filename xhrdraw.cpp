@@ -284,6 +284,26 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 
     auto verts = graph.getVertices();
     auto edges = graph.getEdges();
+
+    // iterate edges only
+#pragma omp parallel for
+    for (int i = 0; i < edges.size() ; i++) {
+        auto edge = edges.at(i);
+
+        int source_vid = edge.getSourceVid();
+        int dest_vid = edge.getDestVid();
+
+        auto source_vertex = graph.getVertexById(source_vid);
+        auto dest_vertex = graph.getVertexById(dest_vid);
+
+        double scaledX1 = std::round((source_vertex.getX() - graph.getMinX()) * scaleX);
+        double scaledY1 = std::round((source_vertex.getY() - graph.getMinY()) * scaleY);
+        double scaledX2 = std::round((dest_vertex.getX() - graph.getMinX()) * scaleX);
+        double scaledY2 = std::round((dest_vertex.getY() - graph.getMinY()) * scaleY);
+
+        XHRDraw::drawEdgeWithData(graphicsView, scaledX1, scaledY1, scaledX2, scaledY2, Qt::black, 0.2, QVariant(source_vid), QString::fromStdString(edge.getName()), QVariant(edge.getLength()));
+    }
+
     // iterate through the vertices and edges of the graph and add them to the scene
 #pragma omp parallel for
     for (int i = 0; i < verts.size(); ++i) {
@@ -291,41 +311,31 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
         double scaledX = std::round((verts[i].getX() - graph.getMinX()) * scaleX );
         double scaledY = std::round((verts[i].getY() - graph.getMinY()) * scaleY );
 
-//        std::cout<<scaledX<< " " << scaledY << std::endl;
-
         int _id = verts[i].getId();
         std::cout<<_id<<endl;
         // draw vertex
         XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, QVariant(_id));
-//        std::cout << i << endl;
-//        if (progress/progressBarWindow->getMax())
-//        progressBarWindow->updateProgress(++progress);
-//        progress++;
+
         // iterate through the adjacency list of the vertex and add edges to the scene
-        for (auto& adjacent_vertex_id : verts[i].getAdjacencyList()) {
+//        for (auto& adjacent_vertex_id : verts[i].getAdjacencyList()) {
 
-            // get coords
-            auto adjacent_vertex = graph.getVertexById(adjacent_vertex_id);
+//            // get coords
+//            auto adjacent_vertex = graph.getVertexById(adjacent_vertex_id);
 
-            // scale to screen size
-            double scaledX2 = std::round((adjacent_vertex.getX() - graph.getMinX()) * scaleX );
-            double scaledY2 = std::round((adjacent_vertex.getY() - graph.getMinY()) * scaleY );
+//            // scale to screen size
+//            double scaledX2 = std::round((adjacent_vertex.getX() - graph.getMinX()) * scaleX );
+//            double scaledY2 = std::round((adjacent_vertex.getY() - graph.getMinY()) * scaleY );
 
-            auto it = std::find_if(edges.begin(), edges.end(),
-                                   [&_id, &adjacent_vertex_id](const Edge& e) { return e.getSourceVid() == _id & e.getDestVid() == adjacent_vertex_id; });
+//            auto it = std::find_if(edges.begin(), edges.end(),
+//                                   [&_id, &adjacent_vertex_id](const Edge& e) { return e.getSourceVid() == _id & e.getDestVid() == adjacent_vertex_id; });
 
-            if (it != edges.end()) {
-                XHRDraw::drawEdgeWithData(graphicsView,scaledX,scaledY,scaledX2,scaledY2,Qt::black,0.2,QVariant(it->getSourceVid()),QString::fromStdString(it->getName()),QVariant(it->getLength()));
-            } else {
-                std::cout<<"Did not find edge, are we sure this exists?"<<std::endl;
-            }
-//            progress++;
-//            progressBarWindow->updateProgress(++progress);
-        }
+//            if (it != edges.end()) {
+//                XHRDraw::drawEdgeWithData(graphicsView,scaledX,scaledY,scaledX2,scaledY2,Qt::black,0.2,QVariant(it->getSourceVid()),QString::fromStdString(it->getName()),QVariant(it->getLength()));
+//            } else {
+//                std::cout<<"Did not find edge, are we sure this exists?"<<std::endl;
+//            }
+//        }
     }
-
-   //draw lines
-
 }
 
 void XHRDraw::drawNavPath(QGraphicsView* g,std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight) {
@@ -354,6 +364,10 @@ void XHRDraw::drawNavPath(QGraphicsView* g,std::vector<Vertex> v, Graph graph_n,
 void XHRDraw::clearItems(QGraphicsView* view) {
     // clear the scene
     view->scene()->clear();
+    // reset any transformations
+    view->resetTransform();
+    // release any cached items -> can cause crashes
+    view->resetCachedContent();
 }
 
 void XHRDraw::clearItems(QGraphicsView* view, std::string label) {

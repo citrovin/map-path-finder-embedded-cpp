@@ -459,7 +459,6 @@ void MainWindow::on_algo_bfs_button_released()
     // get bounds
     int viewWidth = graphicsView->width();
     int viewHeight = graphicsView->height();
-    std::cout<<startVertID<< " "<< endVertID<<std::endl;
     std::vector<Vertex> nav_path = graph.bfs(startVertID,endVertID).first;
     XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
 }
@@ -473,7 +472,6 @@ void MainWindow::on_algo_djikstra_button_released()
     // get bounds
     int viewWidth = graphicsView->width();
     int viewHeight = graphicsView->height();
-    std::cout<<startVertID<< " "<< endVertID<<std::endl;
     std::vector<Vertex> nav_path = graph.dijkstra(startVertID,endVertID).first;
     XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
 }
@@ -486,9 +484,13 @@ void MainWindow::on_algo_astar_button_released()
     // get bounds
     int viewWidth = graphicsView->width();
     int viewHeight = graphicsView->height();
-    std::cout<<startVertID<< " "<< endVertID<<std::endl;
     std::vector<Vertex> nav_path = graph.astar(startVertID,endVertID).first;
     XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+}
+
+void MainWindow::updateAlgoLCD(int visited, int length) {
+//    ui->lcd
+    // TODO: implement algorithm stats display
 }
 
 

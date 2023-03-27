@@ -61,6 +61,8 @@ private slots:
 
     void on_algo_astar_button_released();
 
+    void on_clear_path_button_released();
+
 private:
     Ui::MainWindow *ui;
     std::string tool = "select";
@@ -69,5 +71,6 @@ private:
     int startVertID;
     int endVertID;
     QPointF lastMousePos;
+    void updateAlgoLCD(int, int);
 };
 #endif // MAINWINDOW_H
