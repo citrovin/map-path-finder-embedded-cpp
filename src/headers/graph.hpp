@@ -10,6 +10,7 @@
 #include <set>
 #include <queue>
 #include <iomanip>
+#include <unordered_map>
 #include <map>
 #include <cmath>
 #include <iomanip>
@@ -180,7 +181,7 @@ class Graph{
     private:
         
         vector<Edge> edges_; //do we need this? - christian says yes -> No use only the mapping!! rember filippo remove this!!
-        map<int, Vertex> mapping_; //we can switch to unordered
+        unordered_map<int, Vertex> mapping_;
         map<pair<uint32_t, uint32_t>, Edge> edge_weights;
         double mean_lat;
         double mean_lon;
