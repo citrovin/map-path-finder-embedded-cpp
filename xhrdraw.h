@@ -17,9 +17,12 @@ public:
     static void updateView(QGraphicsView* view);
     static void drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow);
     static void drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id);
+    static void drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id, QVariant label);
     static void drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int y2, QColor color, double thickness, QVariant id, QVariant street_name, QVariant length);
     static void drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow, bool streetData);
     static void drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight);
+    static void clearItems(QGraphicsView* view);
+    static void clearItems(QGraphicsView* view, std::string label);
 };
 
 #endif // XHRDRAW_H

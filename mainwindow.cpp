@@ -268,10 +268,10 @@ void MainWindow::on_load_graph_button_released()
 
 void MainWindow::on_clear_screen_button_released()
 {
-    // Get the first QGraphicsView object in the widget
+    // get the first QGraphicsView object in the widget
     QGraphicsView* graphicsView = ui->graphicsView;
 
-    // Clear the scene
+    // clear the scene
     graphicsView->scene()->clear();
 }
 
@@ -454,6 +454,8 @@ void MainWindow::on_load_graph_button_2_released()
 void MainWindow::on_algo_bfs_button_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
+    // clear previous
+    XHRDraw::clearItems(graphicsView,"nav");
     // get bounds
     int viewWidth = graphicsView->width();
     int viewHeight = graphicsView->height();
@@ -466,6 +468,8 @@ void MainWindow::on_algo_bfs_button_released()
 void MainWindow::on_algo_djikstra_button_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
+    // clear previous
+    XHRDraw::clearItems(graphicsView,"nav");
     // get bounds
     int viewWidth = graphicsView->width();
     int viewHeight = graphicsView->height();
@@ -477,6 +481,8 @@ void MainWindow::on_algo_djikstra_button_released()
 void MainWindow::on_algo_astar_button_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
+    // clear previous
+    XHRDraw::clearItems(graphicsView,"nav");
     // get bounds
     int viewWidth = graphicsView->width();
     int viewHeight = graphicsView->height();

@@ -14,7 +14,7 @@ class VertexEllipseItem : public QGraphicsEllipseItem
                 setAcceptHoverEvents(true);
         }
 
-        // Override the hover events to change the color when hovering
+        // override the hover events to change the color when hovering
         void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
         {
 //            setPen(QPen(Qt::green));
@@ -128,6 +128,34 @@ void XHRDraw::drawVertexWithData(QGraphicsView* view, int x, int y, double r, co
     ellipse->setPen(pen);
     ellipse->setBrush(brush);
     ellipse->setData(0, id);
+
+    // select
+    ellipse->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    ellipse->setVisible(true);
+
+    // Add the ellipse item to the scene
+    scene->addItem(ellipse);
+}
+
+void XHRDraw::drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id, QVariant label)
+{
+    // Get the scene associated with the graphics view
+    QGraphicsScene* scene = view->scene();
+
+    // Create a new ellipse item with the specified dimensions
+    VertexEllipseItem* ellipse = new VertexEllipseItem(QRectF(x - r/2, y - r/2, r, r));
+
+    // draw above lines
+    ellipse->setZValue(1);
+
+    // Set the pen color to red
+    QPen pen(color);
+    QBrush brush(color);
+    pen.setBrush(brush);
+    ellipse->setPen(pen);
+    ellipse->setBrush(brush);
+    ellipse->setData(0, id);
+    ellipse->setData(1, label);
 
     // select
     ellipse->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -318,7 +346,28 @@ void XHRDraw::drawNavPath(QGraphicsView* g,std::vector<Vertex> v, Graph graph_n,
         int _id = v[i].getId();
     //        std::cout<<_id<<endl;
         // draw vertex
-        XHRDraw::drawVertexWithData(g, scaledX, scaledY, 0.5, Qt::green, QVariant(_id));
+        XHRDraw::drawVertexWithData(g, scaledX, scaledY, 0.5, Qt::green, QVariant(_id), QVariant("nav"));
     }
 
+}
+
+void XHRDraw::clearItems(QGraphicsView* view) {
+    // clear the scene
+    view->scene()->clear();
+}
+
+void XHRDraw::clearItems(QGraphicsView* view, std::string label) {
+    QGraphicsScene* scene = view->scene();
+    // crashes
+//    scene->items().erase(std::remove_if(scene->items().begin(), scene->items().end(),
+//                                                       [label](QGraphicsItem* item) { return item->data(1).toString().toStdString() == label; }),
+//                                                         scene->items().end());
+    std::cout<<label<<std::endl;
+    for (auto item : scene->items()) {
+        std::cout<<item->data(1).toString().toStdString()<<std::endl;
+        if (item->data(1).toString().toStdString() == label) {
+            std::cout<<"FOUND LABEL";
+            scene->removeItem(item);
+        }
+    }
 }
