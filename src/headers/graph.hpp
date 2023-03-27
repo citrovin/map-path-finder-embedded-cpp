@@ -597,8 +597,6 @@ class Graph{
         std::deque<uint32_t> active_queue;
         std::set<uint32_t> closed_set;
 
-        std::cout << "A*-Algorithm" <<endl;
-
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
