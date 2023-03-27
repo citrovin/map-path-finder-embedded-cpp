@@ -63,7 +63,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 graphicsView->scale(1.2, 1.2);
 
 
-                // Adjust the size of all shapes based on the new zoom level
+                // adjust the size of all shapes based on the new zoom level
                 qreal newScale = qMax(transform.m11(), transform.m22());
                 foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
                     item->setScale(item->scale() * newScale / zoom);
@@ -71,21 +71,21 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             }
             if (mouseEvent->button() == Qt::RightButton)
             {
-                // Get the position of the mouse click relative to the graphics view
+                QPointF viewCenter = graphicsView->viewport()->rect().center();
+                // get the position of the mouse click relative to the graphics view
                 QPointF point = graphicsView->mapToScene(mouseEvent->pos());
 
                 QTransform transform = graphicsView->transform(); // current view transform
                 qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
 
                 // adjust the scene position based on the zoom factor
-                point.setX(point.x() / zoom);
-                point.setY(point.y() / zoom);
+                point = viewCenter + (point - viewCenter) / zoom;
 
-                // Perform the zoom in operation centered on the mouse click position
-                graphicsView->scale(0.8, 0.8);
+                // zoom in centered on the mouse click position
                 graphicsView->centerOn(point);
+                graphicsView->scale(0.8, 0.8);
 
-                // Adjust the size of all shapes based on the new zoom level
+                // adjust the size of all shapes based on the new zoom level
                 qreal newScale = qMax(transform.m11(), transform.m22());
                 foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
                     item->setScale(item->scale() * newScale / zoom);
@@ -94,7 +94,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         } else if (getTool() == "select"){
             if (mouseEvent->button() == Qt::LeftButton)
             {
-                // Get the position of the mouse click relative to the graphics view
+                // get the position of the mouse click relative to the graphics view
                 QPointF point = graphicsView->mapToScene(mouseEvent->pos());
 
                 QTransform transform = graphicsView->transform(); // current view transform
@@ -245,18 +245,19 @@ void MainWindow::on_load_graph_button_released()
     graph = g;
     int progress_max = graph.getVertices().size() + graph.getEdges().size();
 
+    // TODO: implement threading and mutex
     // Create the progress bar window
     ProgressBar progressBarWindow(nullptr, progress_max);
 
     // Show the progress bar window
-    progressBarWindow.show();
+//    progressBarWindow.show();
 
     // start loading graph
     // draw without street data
     XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow);
 
     // Hide the progress bar window when the operation is complete
-    progressBarWindow.hide();
+//    progressBarWindow.hide();
 
     // Code to be timed
     std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
@@ -427,20 +428,21 @@ void MainWindow::on_load_graph_button_2_released()
     g.computeMercator();
 
     graph = g;
-    int progress_max = graph.getVertices().size() + graph.getEdges().size();
 
+    // TODO: implement threads and mutex for the progressbar display...
     // Create the progress bar window
+    int progress_max = graph.getVertices().size() + graph.getEdges().size();
     ProgressBar progressBarWindow(nullptr, progress_max);
 
     // Show the progress bar window
-    progressBarWindow.show();
+//    progressBarWindow.show();
 
     // start loading graph
     // draw with street data ~ 27x slower
     XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow,true);
 
     // Hide the progress bar window when the operation is complete
-    progressBarWindow.hide();
+//    progressBarWindow.hide();
 
     // Code to be timed
     std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
