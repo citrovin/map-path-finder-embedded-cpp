@@ -81,7 +81,7 @@ class Vertex{ //change to protected and use fucntions to access
         }
         void setParent(int parent) {
             parent_= parent;
-        }        
+        }            
         void setWeight(float weigth) {
             weigth_= weigth;
         }
@@ -329,11 +329,7 @@ class Graph{
                 try {
                     length = stod(line.substr(0, line.find(',')));
                 }catch(invalid_argument) {
-                        double x1 = FcomputeMercatorX(mapping_[dest_vid].getLongitude());
-                        double y1 = FcomputeMercatorY(mapping_[dest_vid].getLatitude());
-                        double x2 = FcomputeMercatorX(mapping_[source_vid].getLongitude());
-                        double y2 = FcomputeMercatorY(mapping_[source_vid].getLatitude());
-                        length = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+                        length = heuristic_distance_estimator(source_vid, dest_vid);
                 }
                 line.erase(0, line.find(',')+1);
 
@@ -435,7 +431,7 @@ class Graph{
         return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
     }
 
-    vector<Vertex> bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
+    pair<vector<Vertex>, vector<Vertex>> bfs(uint32_t vstart, uint32_t vend)  //returns 0 in case of values not found
     {
         deque<uint32_t> active_queue;
         set<uint32_t> closed_set;
@@ -443,7 +439,6 @@ class Graph{
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
-            return {Vertex()}; 
         }
 
         // ID of the start vertex
@@ -492,25 +487,28 @@ class Graph{
         print_result(path, edges_crossed, closed_set.size());
 
         //already converting here to have it directly
-        vector<Vertex> result;
+        vector<Vertex> resultPath;
+        vector<Vertex> resultSet;
         for (auto id : path){
-            result.push_back(mapping_[id]);
+            resultPath.push_back(mapping_[id]);
         }
-        return result;
+        for (auto id : closed_set){
+            resultSet.push_back(mapping_[id]);
+        }
+        return make_pair(resultPath, resultSet);
     }
 
     double getEdgeWeight(uint32_t v1, uint32_t v2){
         return edge_weights[make_pair(v1,v2)].getLength();
     }
 
-    vector<Vertex> dijkstra(uint32_t vstart, uint32_t vend) {
+    pair<vector<Vertex>, vector<Vertex>> dijkstra(uint32_t vstart, uint32_t vend) {
         std::deque<uint32_t> active_queue;
         std::set<uint32_t> closed_set;
         
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
-            return {Vertex()}; 
         }
 
 
@@ -566,7 +564,7 @@ class Graph{
         } while (!active_queue.empty());
 
         vector<uint32_t> path;
-        vector<Edge> edges_crossed;
+        vector<Edge> edges_crossed; //to get the length
         uint32_t v = vend;
         while (v != vstart) {       
             int vOld = v;
@@ -581,16 +579,21 @@ class Graph{
 
         print_result(path, edges_crossed, closed_set.size());
 
-        vector<Vertex> result;
+        vector<Vertex> resultPath;
+        vector<Vertex> resultSet;
         for (auto id : path){
-            result.push_back(mapping_[id]);
+            resultPath.push_back(mapping_[id]);
         }
-        return result;
+        for (auto id : closed_set){
+            resultSet.push_back(mapping_[id]);
+        }
+        return make_pair(resultPath, resultSet);
+
 
     }
 
 
-    vector<Vertex> astar(uint32_t vstart, uint32_t vend) {
+    pair<vector<Vertex>, vector<Vertex>> astar(uint32_t vstart, uint32_t vend) {
         std::deque<uint32_t> active_queue;
         std::set<uint32_t> closed_set;
 
@@ -599,7 +602,6 @@ class Graph{
         //checking if both are in the mapping first
         if(mapping_.find(vstart) == mapping_.end() || mapping_.find(vend) == mapping_.end()){
             cout << "Error: values not in the map! " << endl;
-            return {Vertex()}; 
         }
 
 
@@ -673,11 +675,15 @@ class Graph{
 
         print_result(path, edges_crossed, closed_set.size());
 
-        vector<Vertex> result;
+        vector<Vertex> resultPath;
+        vector<Vertex> resultSet;
         for (auto id : path){
-            result.push_back(mapping_[id]);
+            resultPath.push_back(mapping_[id]);
         }
-        return result;
+        for (auto id : closed_set){
+            resultSet.push_back(mapping_[id]);
+        }
+        return make_pair(resultPath, resultSet);
 
     }
 
