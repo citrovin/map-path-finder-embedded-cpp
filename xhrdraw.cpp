@@ -358,15 +358,10 @@ void XHRDraw::clearItems(QGraphicsView* view) {
 
 void XHRDraw::clearItems(QGraphicsView* view, std::string label) {
     QGraphicsScene* scene = view->scene();
-    // crashes
-//    scene->items().erase(std::remove_if(scene->items().begin(), scene->items().end(),
-//                                                       [label](QGraphicsItem* item) { return item->data(1).toString().toStdString() == label; }),
-//                                                         scene->items().end());
-    std::cout<<label<<std::endl;
+
+    // could instead save a vector of pointers to the vertices and erase that way... way more efficient
     for (auto item : scene->items()) {
-        std::cout<<item->data(1).toString().toStdString()<<std::endl;
         if (item->data(1).toString().toStdString() == label) {
-            std::cout<<"FOUND LABEL";
             scene->removeItem(item);
         }
     }
