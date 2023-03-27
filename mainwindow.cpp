@@ -299,23 +299,31 @@ void MainWindow::on_tool_select_button_released()
 
 void MainWindow::on_set_start_button_released()
 {
-    ui->lcd_start_id->setDigitCount(6);
-    ui->lcd_start_id->display(selectedVertID);
-    // update ui
-    ui->lcd_start_x->display(graph.getVertexById(selectedVertID).getX()/1000);
-    ui->lcd_start_y->display(graph.getVertexById(selectedVertID).getY()/1000);
-    setStartVert(selectedVertID);
+    if(selectedVertID != -1) {
+        ui->lcd_start_id->setDigitCount(6);
+        ui->lcd_start_id->display(selectedVertID);
+        // update ui
+        ui->lcd_start_x->display(graph.getVertexById(selectedVertID).getX()/1000);
+        ui->lcd_start_y->display(graph.getVertexById(selectedVertID).getY()/1000);
+        setStartVert(selectedVertID);
+    } else {
+        QMessageBox::warning(this, "Warning!", "Please select a vertex first.");
+    }
 }
 
 
 void MainWindow::on_set_end_button_released()
 {
-    ui->lcd_end_id->setDigitCount(6);
-    ui->lcd_end_id->display(selectedVertID);
-    // update ui
-    ui->lcd_end_x->display(graph.getVertexById(selectedVertID).getX()/1000);
-    ui->lcd_end_y->display(graph.getVertexById(selectedVertID).getY()/1000);
-    setEndVert(selectedVertID);
+    if(selectedVertID != -1) {
+        ui->lcd_end_id->setDigitCount(6);
+        ui->lcd_end_id->display(selectedVertID);
+        // update ui
+        ui->lcd_end_x->display(graph.getVertexById(selectedVertID).getX()/1000);
+        ui->lcd_end_y->display(graph.getVertexById(selectedVertID).getY()/1000);
+        setEndVert(selectedVertID);
+    } else {
+        QMessageBox::warning(this, "Warning!", "Please select a vertex first.");
+    }
 }
 
 void MainWindow::setEndVert(int id) {
@@ -455,39 +463,51 @@ void MainWindow::on_load_graph_button_2_released()
 
 void MainWindow::on_algo_bfs_button_released()
 {
-    QGraphicsView* graphicsView = ui->graphicsView;
-    // clear previous
-    XHRDraw::clearItems(graphicsView,"nav");
-    // get bounds
-    int viewWidth = graphicsView->width();
-    int viewHeight = graphicsView->height();
-    std::vector<Vertex> nav_path = graph.bfs(startVertID,endVertID).first;
-    XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+    if(startVertID != -1 && endVertID != -1){
+        QGraphicsView* graphicsView = ui->graphicsView;
+        // clear previous
+        XHRDraw::clearItems(graphicsView,"nav");
+        // get bounds
+        int viewWidth = graphicsView->width();
+        int viewHeight = graphicsView->height();
+        std::vector<Vertex> nav_path = graph.bfs(startVertID,endVertID).first;
+        XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+    } else {
+        QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
+    }
 }
 
 
 void MainWindow::on_algo_djikstra_button_released()
 {
-    QGraphicsView* graphicsView = ui->graphicsView;
-    // clear previous
-    XHRDraw::clearItems(graphicsView,"nav");
-    // get bounds
-    int viewWidth = graphicsView->width();
-    int viewHeight = graphicsView->height();
-    std::vector<Vertex> nav_path = graph.dijkstra(startVertID,endVertID).first;
-    XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+    if(startVertID != -1 && endVertID != -1){
+        QGraphicsView* graphicsView = ui->graphicsView;
+        // clear previous
+        XHRDraw::clearItems(graphicsView,"nav");
+        // get bounds
+        int viewWidth = graphicsView->width();
+        int viewHeight = graphicsView->height();
+        std::vector<Vertex> nav_path = graph.dijkstra(startVertID,endVertID).first;
+        XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+    } else {
+        QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
+    }
 }
 
 void MainWindow::on_algo_astar_button_released()
 {
-    QGraphicsView* graphicsView = ui->graphicsView;
-    // clear previous
-    XHRDraw::clearItems(graphicsView,"nav");
-    // get bounds
-    int viewWidth = graphicsView->width();
-    int viewHeight = graphicsView->height();
-    std::vector<Vertex> nav_path = graph.astar(startVertID,endVertID).first;
-    XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+    if(startVertID != -1 && endVertID != -1){
+        QGraphicsView* graphicsView = ui->graphicsView;
+        // clear previous
+        XHRDraw::clearItems(graphicsView,"nav");
+        // get bounds
+        int viewWidth = graphicsView->width();
+        int viewHeight = graphicsView->height();
+        std::vector<Vertex> nav_path = graph.astar(startVertID,endVertID).first;
+        XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+    } else {
+        QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
+    }
 }
 
 void MainWindow::updateAlgoLCD(int visited, int length) {

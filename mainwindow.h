@@ -66,10 +66,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::string tool = "select";
-    int selectedVertID;
+    int selectedVertID = -1;
     QGraphicsEllipseItem* selectedVertItem = nullptr;
-    int startVertID;
-    int endVertID;
+    int startVertID = -1;
+    int endVertID = -1;
     QPointF lastMousePos;
     void updateAlgoLCD(int, int);
 };
