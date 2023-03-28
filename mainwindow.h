@@ -72,5 +72,6 @@ private:
     int endVertID = -1;
     QPointF lastMousePos;
     void updateAlgoLCD(int, int);
+    double prevRotation = 0;
 };
 #endif // MAINWINDOW_H

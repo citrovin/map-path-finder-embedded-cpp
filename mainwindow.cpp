@@ -362,9 +362,10 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
 {
     // rotate the view
     QGraphicsView* graphicsView = ui->graphicsView;
-    QTransform transform;
-    transform.rotate(value);
-    graphicsView->setTransform(transform);
+    // set delta rotation
+    graphicsView->setTransform(graphicsView->transform().rotate(prevRotation - value));
+    // set last angle as this one
+    prevRotation = value;
 }
 
 
@@ -376,11 +377,12 @@ void MainWindow::on_tool_move_button_released()
 
 void MainWindow::on_util_reset_rotation_button_released()
 {
+    // get view
     QGraphicsView* graphicsView = ui->graphicsView;
-    QTransform transform;
-    transform.reset();
-    graphicsView->setTransform(transform);
-
+    // rotate with negative of last rotation to get to 0 rotation
+    graphicsView->setTransform(graphicsView->transform().rotate(-360+prevRotation));
+    // set last angle as 0
+    prevRotation = 0;
     // reset slider
     ui->horizontalSlider->setSliderPosition(0);
 }
