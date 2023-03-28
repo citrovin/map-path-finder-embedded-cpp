@@ -476,6 +476,12 @@ void MainWindow::on_algo_bfs_button_released()
         std::vector<Vertex> nav_path_visited = graph.bfs(startVertID,endVertID).second;
         XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+
+        // set lcds for vertices visited and path length
+        ui->algo_distance_lcd->setDigitCount(6);
+        ui->algo_distance_lcd->display((int)nav_path.size());
+        ui->algo_visited_lcd->setDigitCount(6);
+        ui->algo_visited_lcd->display((int)nav_path_visited.size());
     } else {
         QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
     }
@@ -495,6 +501,12 @@ void MainWindow::on_algo_djikstra_button_released()
         std::vector<Vertex> nav_path_visited = graph.dijkstra(startVertID,endVertID).second;
         XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+
+        // set lcds for vertices visited and path length
+        ui->algo_distance_lcd->setDigitCount(6);
+        ui->algo_distance_lcd->display((int)nav_path.size());
+        ui->algo_visited_lcd->setDigitCount(6);
+        ui->algo_visited_lcd->display((int)nav_path_visited.size());
     } else {
         QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
     }
@@ -513,6 +525,12 @@ void MainWindow::on_algo_astar_button_released()
         std::vector<Vertex> nav_path_visited = graph.astar(startVertID,endVertID).second;
         XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+
+        // set lcds for vertices visited and path length
+        ui->algo_distance_lcd->setDigitCount(6);
+        ui->algo_distance_lcd->display((int)nav_path.size());
+        ui->algo_visited_lcd->setDigitCount(6);
+        ui->algo_visited_lcd->display((int)nav_path_visited.size());
     } else {
         QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
     }
@@ -529,5 +547,11 @@ void MainWindow::on_clear_path_button_released()
     QGraphicsView* graphicsView = ui->graphicsView;
 
     XHRDraw::clearItems(graphicsView,"nav");
+
+    // reset lcds
+    ui->algo_distance_lcd->setDigitCount(6);
+    ui->algo_distance_lcd->display(0);
+    ui->algo_visited_lcd->setDigitCount(6);
+    ui->algo_visited_lcd->display(0);
 }
 
