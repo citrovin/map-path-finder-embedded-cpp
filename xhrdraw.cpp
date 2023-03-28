@@ -282,7 +282,7 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 //        std::cout<<scaledX<< " " << scaledY << std::endl;
 
         int _id = verts[i].getId();
-        std::cout<<_id<<endl;
+//        std::cout<<_id<<endl;
         // draw vertex
         XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, QVariant(_id));
 //        std::cout << i << endl;
@@ -338,7 +338,10 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
         double scaledX2 = std::round((dest_vertex.getX() - graph.getMinX()) * scaleX);
         double scaledY2 = std::round((dest_vertex.getY() - graph.getMinY()) * scaleY);
 
-        XHRDraw::drawEdgeWithData(graphicsView, scaledX1, scaledY1, scaledX2, scaledY2, Qt::black, 0.2, QVariant(source_vid), QString("") ,QString::fromStdString(edge.getName()), QVariant(edge.getLength()));
+        // prevent weird edges bug by calculating distance between points.. idk why this bug happens?
+        if(std::sqrt(std::pow(scaledX2 - scaledX1, 2) + std::pow(scaledY2 - scaledY1, 2)) > 0) {
+            XHRDraw::drawEdgeWithData(graphicsView, scaledX1, scaledY1, scaledX2, scaledY2, Qt::black, 0.2, QVariant(source_vid), QString("") ,QString::fromStdString(edge.getName()), QVariant(edge.getLength()));
+        }
     }
 
     // iterate through the vertices of the graph and add them to the scene
@@ -349,10 +352,13 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
         double scaledY = std::round((verts[i].getY() - graph.getMinY()) * scaleY );
 
         int _id = verts[i].getId();
-        std::cout<<_id<<endl;
+//        std::cout<<_id<<endl;
         // draw vertex
         XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, QVariant(_id));
     }
+
+    // fit all into view
+    graphicsView->fitInView(graphicsView->scene()->itemsBoundingRect());
 }
 
 void XHRDraw::drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight) {

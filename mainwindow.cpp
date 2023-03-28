@@ -105,7 +105,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 //                point.setY(point.y() / zoom);
 
 
-                std::cout<<"Click at: "<<point.x()<< " " <<point.y()<<std::endl;
+//                std::cout<<"Click at: "<<point.x()<< " " <<point.y()<<std::endl;
 
                 // Iterate through all items in the scene to find the closest point
                 QGraphicsItem* closestItem = nullptr;
@@ -164,7 +164,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 }
             }
 
-            std::cout<<selectedVertID<<std::endl;
+//            std::cout<<selectedVertID<<std::endl;
         } else if( getTool() == "move") {
             if (mouseEvent->button() == Qt::LeftButton) {
 
