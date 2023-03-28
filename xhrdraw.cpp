@@ -17,15 +17,11 @@ class VertexEllipseItem : public QGraphicsEllipseItem
         // override the hover events to change the color when hovering
         void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
         {
-//            setPen(QPen(Qt::green));
-//            setBrush(QBrush(Qt::green));
             QGraphicsEllipseItem::hoverEnterEvent(event);
         }
 
         void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override
         {
-//            setPen(QPen(Qt::red));
-//            setBrush(QBrush(Qt::red));
             QGraphicsEllipseItem::hoverLeaveEvent(event);
         }
 };
@@ -79,7 +75,6 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
     {
         setPen(QPen(Qt::yellow,0.7));
-//        std::cout<<data(1).toString().toStdString()<<std::endl;
         QGraphicsLineItem::hoverEnterEvent(event);
     }
 
@@ -92,66 +87,64 @@ protected:
 
 void XHRDraw::drawCircle(QGraphicsView* view, int x, int y, double r, const QColor& color)
 {
-    // Get the scene associated with the graphics view
+    // get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
 
-    // Create a new ellipse item with the specified dimensions
+    // create a new ellipse item with the specified dimensions
     QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(QRectF(x - r/2, y - r/2, r, r));
 
     // draw above lines
     ellipse->setZValue(1);
 
-    // Set the pen color to red
+    // set the pen color to red
     QPen pen(color);
     QBrush brush(color);
     ellipse->setPen(pen);
     ellipse->setBrush(brush);
 
-    // Add the ellipse item to the scene
+    // add the ellipse item to the scene
     scene->addItem(ellipse);
 }
 
 void XHRDraw::drawCircleFast(QGraphicsView* view, int x, int y, double r, const QColor& color)
 {
-    // Get the scene associated with the graphics view
+    // get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
 
-    // QGraphicsEllipseItem* ellipse = new QGraphicsEllipseItem(x, y, r, r);
-
-    // Create a new QPixmap object to draw on
+    // create a new QPixmap object to draw on
     QPixmap pixmap(view->width(), view->height());
     pixmap.fill(color);
 
-    // Create a QPainter object to draw on the QPixmap
+    // create a QPainter object to draw on the QPixmap
     QPainter painter(&pixmap);
 
-    // Set the pen color and thickness
+    // set the pen color and thickness
     QPen pen(color);
     pen.setWidth(2);
     painter.setPen(pen);
 
-    // Draw the ellipse on the QPixmap
+    // draw the ellipse on the QPixmap
     painter.drawEllipse(QRectF(x, y, r, r));
 
-    // Add the QPixmap as a QGraphicsPixmapItem to the scene
+    // add the QPixmap as a QGraphicsPixmapItem to the scene
     QGraphicsPixmapItem* pixmapItem = scene->addPixmap(pixmap);
 
-    // Set the position of the pixmap item to the top-left corner of the view
+    // set the position of the pixmap item to the top-left corner of the view
     pixmapItem->setPos(view->mapToScene(0, 0));
 }
 
 void XHRDraw::drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id)
 {
-    // Get the scene associated with the graphics view
+    // get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
 
-    // Create a new ellipse item with the specified dimensions
+    // create a new ellipse item with the specified dimensions
     VertexEllipseItem* ellipse = new VertexEllipseItem(QRectF(x - r/2, y - r/2, r, r));
 
     // draw above lines
     ellipse->setZValue(1);
 
-    // Set the pen color to red
+    // set the pen color to red
     QPen pen(color);
     QBrush brush(color);
     pen.setBrush(brush);
@@ -163,22 +156,22 @@ void XHRDraw::drawVertexWithData(QGraphicsView* view, int x, int y, double r, co
     ellipse->setFlag(QGraphicsItem::ItemIsSelectable, true);
     ellipse->setVisible(true);
 
-    // Add the ellipse item to the scene
+    // add the ellipse item to the scene
     scene->addItem(ellipse);
 }
 
 void XHRDraw::drawVertexWithData(QGraphicsView* view, int x, int y, double r, const QColor& color, QVariant id, QVariant label)
 {
-    // Get the scene associated with the graphics view
+    // get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
 
-    // Create a new ellipse item with the specified dimensions
+    // create a new ellipse item with the specified dimensions
     VertexEllipseItem* ellipse = new VertexEllipseItem(QRectF(x - r/2, y - r/2, r, r));
 
     // draw above lines
     ellipse->setZValue(1);
 
-    // Set the pen color to red
+    // set the pen color to red
     QPen pen(color);
     QBrush brush(color);
     pen.setBrush(brush);
@@ -191,7 +184,7 @@ void XHRDraw::drawVertexWithData(QGraphicsView* view, int x, int y, double r, co
     ellipse->setFlag(QGraphicsItem::ItemIsSelectable, true);
     ellipse->setVisible(true);
 
-    // Add the ellipse item to the scene
+    // add the ellipse item to the scene
     scene->addItem(ellipse);
 }
 
@@ -206,15 +199,15 @@ void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* li
     // draw below points
     path->setZValue(0);
 
-    // create a QPainterPath object to store the points
+    // create object to store the points
     QPainterPath pathPoints;
 
     // add the lines to path
+    // parallel processing
 #pragma omp parallel for
     for (int i = 0; i < lines->size(); i++) {
         pathPoints.moveTo((*lines)[i][0], (*lines)[i][1]); // more thread safe
         pathPoints.lineTo((*lines)[i][2], (*lines)[i][3]); // more thread safe
-//        std::cout<< i << std::endl;
     }
 
     // set the path of the path item
@@ -237,6 +230,7 @@ void XHRDraw::drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int 
 
     // create a new line item
     QGraphicsLineItem* line;
+    // check if we want to draw a nav edge
     if(label.toString().toStdString() == "nav") {
         line = new NavEdgeLineItem(x1,y1,x2,y2);
     } else {
@@ -248,11 +242,10 @@ void XHRDraw::drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int 
     line->setPen(pen);
     line->setData(0, id);
     line->setData(1, label);
-//    std::cout<<street_name.toString().toStdString()<<std::endl;
     line->setData(2, length);
     line->setData(3, street_name);
     line->setToolTip("Street name: " + street_name.toString() + "\nLength: " + QString::fromStdString(std::to_string(round(length.toDouble() * pow(10, 2)) / pow(10, 2))) + " meters");
-    // Add the line item to the scene
+    // add the line item to the scene
     scene->addItem(line);
 }
 
@@ -262,7 +255,8 @@ void XHRDraw::updateView(QGraphicsView* view) {
 
 
 // TODO: remove scaling from first draw of graph
-void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow) {
+// TODO: use map instead of vectors
+void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph) {
     int progress = 0;
 
     std::vector<std::vector<double>> lines;
@@ -273,22 +267,18 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 
     auto verts = graph.getVertices();
     // iterate through the vertices and edges of the graph and add them to the scene
+    // parallel processing
 #pragma omp parallel for
     for (int i = 0; i < verts.size(); ++i) {
         // scale to screen size
         double scaledX = std::round((verts[i].getX() - graph.getMinX()) * scaleX );
         double scaledY = std::round((verts[i].getY() - graph.getMinY()) * scaleY );
 
-//        std::cout<<scaledX<< " " << scaledY << std::endl;
-
         int _id = verts[i].getId();
-//        std::cout<<_id<<endl;
+
         // draw vertex
         XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, QVariant(_id));
-//        std::cout << i << endl;
-//        if (progress/progressBarWindow->getMax())
-//        progressBarWindow->updateProgress(++progress);
-//        progress++;
+
         // iterate through the adjacency list of the vertex and add edges to the scene
         for (auto& adjacent_vertex_id : verts[i].getAdjacencyList()) {
 
@@ -301,8 +291,6 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
 
             // add adjacency lines to vector
             lines.push_back({scaledX,scaledY,scaledX2,scaledY2});
-//            progress++;
-//            progressBarWindow->updateProgress(++progress);
         }
     }
 
@@ -310,7 +298,8 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
     XHRDraw::drawLine(graphicsView,&lines,Qt::black,0.2);
 }
 
-void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow, bool streetData) {
+// OVERLOAD with street data
+void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, bool streetData) {
     int progress = 0;
 
     std::vector<std::vector<double>> lines;
@@ -319,10 +308,12 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
     double scaleX = viewWidth / (graph.getMaxX() - graph.getMinX());
     double scaleY = viewHeight / (graph.getMaxY() - graph.getMinY());
 
+    // TODO: switch to map in future version
     auto verts = graph.getVertices();
     auto edges = graph.getEdges();
 
     // iterate edges only
+    // parallel processing
 #pragma omp parallel for
     for (int i = 0; i < edges.size() ; i++) {
         auto edge = edges.at(i);
@@ -345,14 +336,16 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
     }
 
     // iterate through the vertices of the graph and add them to the scene
+    // parallel processing
 #pragma omp parallel for
     for (int i = 0; i < verts.size(); ++i) {
         // scale to screen size
         double scaledX = std::round((verts[i].getX() - graph.getMinX()) * scaleX );
         double scaledY = std::round((verts[i].getY() - graph.getMinY()) * scaleY );
 
+        // get id
         int _id = verts[i].getId();
-//        std::cout<<_id<<endl;
+
         // draw vertex
         XHRDraw::drawVertexWithData(graphicsView, scaledX, scaledY, 0.2, Qt::red, QVariant(_id));
     }
@@ -367,11 +360,13 @@ void XHRDraw::drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n
     double scaleX = viewWidth / (graph_n.getMaxX() - graph_n.getMinX());
     double scaleY = viewHeight / (graph_n.getMaxY() - graph_n.getMinY());
 
+    // TODO: switch to map in future version
     auto verts = graph_n.getVertices();
     auto edges = graph_n.getEdges();
 
     auto v_size =  v.size();
 
+    // parallel processing
 #pragma omp parallel for
     for (int i = 1; i < v_size; ++i) {
         // scale to screen size
@@ -380,8 +375,9 @@ void XHRDraw::drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n
         double scaledX2 = std::round((v[i].getX() - graph_n.getMinX()) * scaleX );
         double scaledY2 = std::round((v[i].getY() - graph_n.getMinY()) * scaleY );
 
+        // get id
         int _id = v[i-1].getId();
-    //        std::cout<<_id<<endl;
+
         // draw vertex
         XHRDraw::drawVertexWithData(g, scaledX1, scaledY1, 0.5, Qt::green, QVariant(_id), QVariant("nav"));
 
@@ -394,11 +390,13 @@ void XHRDraw::drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n
 
         Edge edge;
 
+        // check
         if (it != edges.end()) {
             edge = *it;
         } else {
             std::cout<<"Something went wrong... why is there no edge here? --- drawNavPath, edges"<<std::endl;
         }
+
         // draw the edge to the next vertex
         XHRDraw::drawEdgeWithData(g, scaledX1, scaledY1, scaledX2, scaledY2, Qt::green, 0.5, QVariant(source_vid), QString::fromStdString("nav"),QString::fromStdString(edge.getName()), QVariant(edge.getLength()));
     }
@@ -417,16 +415,18 @@ void XHRDraw::drawNavPathVisited(QGraphicsView* g, std::vector<Vertex> v, Graph 
     double scaleX = viewWidth / (graph_n.getMaxX() - graph_n.getMinX());
     double scaleY = viewHeight / (graph_n.getMaxY() - graph_n.getMinY());
 
+    // store the vector size
     auto v_size =  v.size();
 
+    // parallel processing
 #pragma omp parallel for
     for (int i = 0; i < v_size; ++i) {
         // scale to screen size
         double scaledX = std::round((v[i].getX() - graph_n.getMinX()) * scaleX );
         double scaledY = std::round((v[i].getY() - graph_n.getMinY()) * scaleY );
 
+        // get id
         int _id = v[i].getId();
-    //        std::cout<<_id<<endl;
         // draw vertex
         XHRDraw::drawVertexWithData(g, scaledX, scaledY, 0.5, Qt::darkBlue, QVariant(_id), QVariant("nav"));
 

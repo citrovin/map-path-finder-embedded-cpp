@@ -125,7 +125,7 @@ color: rgb(0, 0, 0);</string>
      <item>
       <widget class="QPushButton" name="util_reset_zoom_button">
        <property name="text">
-        <string>Reset Zoom</string>
+        <string>Reset View</string>
        </property>
       </widget>
      </item>
