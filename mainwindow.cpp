@@ -56,7 +56,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
 
                 // adjust the scene position based on the zoom factor
-                point = viewCenter + (point - viewCenter) / zoom;
+//                point = viewCenter + (point - viewCenter) / zoom;
 
                 // Perform the zoom in operation centered on the mouse click position
                 graphicsView->centerOn(point);
@@ -64,10 +64,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 
                 // adjust the size of all shapes based on the new zoom level
-                qreal newScale = qMax(transform.m11(), transform.m22());
-                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-                    item->setScale(item->scale() * newScale / zoom);
-                }
+//                qreal newScale = qMax(transform.m11(), transform.m22());
+//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+//                    item->setScale(item->scale() * newScale / zoom);
+//                }
             }
             if (mouseEvent->button() == Qt::RightButton)
             {
@@ -79,17 +79,17 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
 
                 // adjust the scene position based on the zoom factor
-                point = viewCenter + (point - viewCenter) / zoom;
+//                point = viewCenter + (point - viewCenter) / zoom;
 
                 // zoom in centered on the mouse click position
                 graphicsView->centerOn(point);
                 graphicsView->scale(0.8, 0.8);
 
                 // adjust the size of all shapes based on the new zoom level
-                qreal newScale = qMax(transform.m11(), transform.m22());
-                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-                    item->setScale(item->scale() * newScale / zoom);
-                }
+//                qreal newScale = qMax(transform.m11(), transform.m22());
+//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
+//                    item->setScale(item->scale() * newScale / zoom);
+//                }
             }
         } else if (getTool() == "select"){
             if (mouseEvent->button() == Qt::LeftButton)
