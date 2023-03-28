@@ -471,6 +471,8 @@ void MainWindow::on_algo_bfs_button_released()
         int viewWidth = graphicsView->width();
         int viewHeight = graphicsView->height();
         std::vector<Vertex> nav_path = graph.bfs(startVertID,endVertID).first;
+        std::vector<Vertex> nav_path_visited = graph.bfs(startVertID,endVertID).second;
+        XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
     } else {
         QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
@@ -488,6 +490,8 @@ void MainWindow::on_algo_djikstra_button_released()
         int viewWidth = graphicsView->width();
         int viewHeight = graphicsView->height();
         std::vector<Vertex> nav_path = graph.dijkstra(startVertID,endVertID).first;
+        std::vector<Vertex> nav_path_visited = graph.dijkstra(startVertID,endVertID).second;
+        XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
     } else {
         QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
@@ -504,6 +508,8 @@ void MainWindow::on_algo_astar_button_released()
         int viewWidth = graphicsView->width();
         int viewHeight = graphicsView->height();
         std::vector<Vertex> nav_path = graph.astar(startVertID,endVertID).first;
+        std::vector<Vertex> nav_path_visited = graph.astar(startVertID,endVertID).second;
+        XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
     } else {
         QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");

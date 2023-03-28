@@ -21,6 +21,7 @@ public:
     static void drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int y2, QColor color, double thickness, QVariant id, QVariant label, QVariant street_name, QVariant length);
     static void drawGraph(QGraphicsView* graphicsView, QString fileName, int viewWidth, int viewHeight, Graph graph, ProgressBar* progressBarWindow, bool streetData);
     static void drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight);
+    static void drawNavPathVisited(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight);
     static void clearItems(QGraphicsView* view);
     static void clearItems(QGraphicsView* view, std::string label);
 };

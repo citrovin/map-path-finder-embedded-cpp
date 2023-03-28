@@ -411,6 +411,28 @@ void XHRDraw::drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n
     XHRDraw::drawVertexWithData(g, scaledX1, scaledY1, 0.5, Qt::green, QVariant(_id), QVariant("nav"));
 }
 
+void XHRDraw::drawNavPathVisited(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight) {
+
+    // compute scale factors
+    double scaleX = viewWidth / (graph_n.getMaxX() - graph_n.getMinX());
+    double scaleY = viewHeight / (graph_n.getMaxY() - graph_n.getMinY());
+
+    auto v_size =  v.size();
+
+#pragma omp parallel for
+    for (int i = 0; i < v_size; ++i) {
+        // scale to screen size
+        double scaledX = std::round((v[i].getX() - graph_n.getMinX()) * scaleX );
+        double scaledY = std::round((v[i].getY() - graph_n.getMinY()) * scaleY );
+
+        int _id = v[i].getId();
+    //        std::cout<<_id<<endl;
+        // draw vertex
+        XHRDraw::drawVertexWithData(g, scaledX, scaledY, 0.5, Qt::darkBlue, QVariant(_id), QVariant("nav"));
+
+    }
+}
+
 void XHRDraw::clearItems(QGraphicsView* view) {
     // clear the scene
     view->scene()->clear();
