@@ -192,6 +192,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::on_clear_screen_button_released()
 {
+    // remove any refs to items
+    selectedVertID = -1;
+    selectedVertItem = nullptr;
+
     // get the first QGraphicsView object in the widget
     QGraphicsView* graphicsView = ui->graphicsView;
 
