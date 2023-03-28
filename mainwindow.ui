@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1146</width>
+    <width>991</width>
     <height>664</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1146</width>
+    <width>991</width>
     <height>664</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1146</width>
+    <width>991</width>
     <height>664</height>
    </size>
   </property>
@@ -195,9 +195,9 @@ color: rgb(0, 0, 0);</string>
    <widget class="QWidget" name="verticalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>760</x>
+      <x>770</x>
       <y>10</y>
-      <width>371</width>
+      <width>201</width>
       <height>121</height>
      </rect>
     </property>
@@ -265,6 +265,12 @@ color: rgb(0, 0, 0);</string>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_4">
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
           <string>ID:</string>
          </property>
@@ -313,6 +319,12 @@ color: rgb(0, 0, 0);</string>
        </item>
        <item row="0" column="2">
         <widget class="QLabel" name="label_7">
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
           <string>ID:</string>
          </property>
@@ -325,10 +337,10 @@ color: rgb(0, 0, 0);</string>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>949</x>
-      <y>200</y>
-      <width>181</width>
-      <height>171</height>
+      <x>770</x>
+      <y>160</y>
+      <width>201</width>
+      <height>111</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -377,35 +389,6 @@ color: rgb(0, 0, 0);</string>
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_4">
-    <property name="geometry">
-     <rect>
-      <x>760</x>
-      <y>140</y>
-      <width>371</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QPushButton" name="set_start_button">
-       <property name="text">
-        <string>Set Start Point</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="set_end_button">
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0);</string>
-       </property>
-       <property name="text">
-        <string>Set End Point</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
@@ -425,23 +408,13 @@ color: rgb(0, 0, 0);</string>
    <widget class="QWidget" name="gridLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>950</x>
-      <y>390</y>
-      <width>181</width>
+      <x>770</x>
+      <y>420</y>
+      <width>201</width>
       <height>80</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_17">
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0);</string>
-       </property>
-       <property name="text">
-        <string>Visited Verts:</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QLCDNumber" name="algo_distance_lcd"/>
      </item>
@@ -458,6 +431,16 @@ color: rgb(0, 0, 0);</string>
        </property>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_17">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Visited Verts:</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget_5">
@@ -465,7 +448,7 @@ color: rgb(0, 0, 0);</string>
      <rect>
       <x>630</x>
       <y>550</y>
-      <width>501</width>
+      <width>331</width>
       <height>56</height>
      </rect>
     </property>
@@ -579,9 +562,9 @@ background-color: rgb(239, 239, 239);</string>
     <property name="geometry">
      <rect>
       <x>770</x>
-      <y>200</y>
-      <width>160</width>
-      <height>71</height>
+      <y>300</y>
+      <width>201</width>
+      <height>79</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -608,7 +591,41 @@ background-color: rgb(239, 239, 239);</string>
        </property>
       </widget>
      </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QPushButton" name="set_start_button">
+         <property name="text">
+          <string>Set Start Point</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="set_end_button">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="text">
+          <string>Set End Point</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
     </layout>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>10</y>
+      <width>16</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -616,7 +633,7 @@ background-color: rgb(239, 239, 239);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1146</width>
+     <width>991</width>
      <height>21</height>
     </rect>
    </property>
