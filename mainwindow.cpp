@@ -7,10 +7,7 @@
 #include <QTextEdit>
 #include <QMatrix2x2>
 
-#include "progressbar.h"
 #include "xhrdraw.h"
-#include "messagebox.h"
-#include "src/headers/display.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,17 +15,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Get the graphics view from the UI
+    // get the graphics view from the UI
     QGraphicsView* graphicsView = ui->graphicsView;
 
-    // Set up the scene and add it to the graphics view
+    // set up the scene and add it to the graphics view
     QGraphicsScene* scene = new QGraphicsScene(this);
     graphicsView->setScene(scene);
 
-    // Center the graphics view on the scene
+    // center the graphics view on the scene
     graphicsView->setAlignment(Qt::AlignCenter);
 
-    // Install event filter on the graphics view
+    // install event filter on the graphics view
     graphicsView->viewport()->installEventFilter(this);
 }
 
@@ -37,10 +34,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-// Implement the event filter in the main window
+// implement the event filter in the main window
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    // Get the graphics view from the UI
+    // get the graphics view from the UI
     QGraphicsView* graphicsView = ui->graphicsView;
 
     if (event->type() == QEvent::MouseButtonPress)
@@ -50,25 +47,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             if (mouseEvent->button() == Qt::LeftButton)
             {
                 QPointF viewCenter = graphicsView->viewport()->rect().center();
-                // Get the position of the mouse click relative to the graphics view
+                // get the position of the mouse click relative to the graphics view
                 QPointF point = graphicsView->mapToScene(mouseEvent->pos());
 
                 QTransform transform = graphicsView->transform(); // current view transform
                 qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
 
-                // adjust the scene position based on the zoom factor
-//                point = viewCenter + (point - viewCenter) / zoom;
-
-                // Perform the zoom in operation centered on the mouse click position
+                // perform the zoom in operation centered on the mouse click position
                 graphicsView->centerOn(point);
                 graphicsView->scale(1.2, 1.2);
 
-
-                // adjust the size of all shapes based on the new zoom level
-//                qreal newScale = qMax(transform.m11(), transform.m22());
-//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-//                    item->setScale(item->scale() * newScale / zoom);
-//                }
             }
             if (mouseEvent->button() == Qt::RightButton)
             {
@@ -79,18 +67,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 QTransform transform = graphicsView->transform(); // current view transform
                 qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
 
-                // adjust the scene position based on the zoom factor
-//                point = viewCenter + (point - viewCenter) / zoom;
-
                 // zoom in centered on the mouse click position
                 graphicsView->centerOn(point);
                 graphicsView->scale(0.8, 0.8);
-
-                // adjust the size of all shapes based on the new zoom level
-//                qreal newScale = qMax(transform.m11(), transform.m22());
-//                foreach (QGraphicsItem *item, graphicsView->scene()->items()) {
-//                    item->setScale(item->scale() * newScale / zoom);
-//                }
             }
         } else if (getTool() == "select"){
             if (mouseEvent->button() == Qt::LeftButton)
@@ -101,33 +80,21 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 QTransform transform = graphicsView->transform(); // current view transform
                 qreal zoom = qMax(transform.m11(), transform.m22()); // get the zoom factor
 
-                // adjust the scene position based on the zoom factor
-//                point.setX(point.x() / zoom);
-//                point.setY(point.y() / zoom);
-
-
-//                std::cout<<"Click at: "<<point.x()<< " " <<point.y()<<std::endl;
-
-                // Iterate through all items in the scene to find the closest point
+                // iterate through all items in the scene to find the closest point
                 QGraphicsItem* closestItem = nullptr;
                 qreal minDistance = std::numeric_limits<qreal>::max();
 
-//                std::cout<<"Min dist.: "<<minDistance<<std::endl;
-
                 foreach (QGraphicsItem* item, graphicsView->scene()->items()) {
-                    // Check if the item is selectable and visible
+                    // check if the item is selectable and visible
                     if (item->flags() & QGraphicsItem::ItemIsSelectable && item->isVisible()) {
-                        // Get the center point of the item
+                        // get the center point of the item
                         QPointF center = item->boundingRect().center();
 
-                        // Compute the distance from the center to the mouse position
+                        // compute the distance from the center to the mouse position
                         qreal distance = QLineF(center, point).length();
 
-//                        std::cout<<"Dist. to closest: "<<distance<<std::endl;
-
-                        // If the distance is smaller than the current minimum, update the closest item and distance
+                        // if the distance is smaller than the current minimum, update the closest item and distance
                         if (distance < minDistance) {
-//                            std::cout<<"Found closest point with dist.: "<< distance <<std::endl;
                             closestItem = item;
                             minDistance = distance;
                         }

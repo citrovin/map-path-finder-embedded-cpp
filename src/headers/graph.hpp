@@ -176,11 +176,10 @@ class Edge{
         string name_;
 };
 
-
 class Graph{
     private:
         
-        vector<Edge> edges_; //do we need this? - christian says yes -> No use only the mapping!! rember filippo remove this!!
+        vector<Edge> edges_; //do we need this? - christian says yes -> No use only the mapping!! rember filippo remove this!! - christian: no time to refactor the code, trust me I'm an engineer
         unordered_map<int, Vertex> mapping_;
         map<pair<uint32_t, uint32_t>, Edge> edge_weights;
         double mean_lat;
@@ -357,6 +356,7 @@ class Graph{
     double getMeanLon(){
         return mean_lon;
     }
+
     // vertices in the graph
     vector<Vertex> getVertices() const {
         vector<Vertex> vertices;
@@ -719,137 +719,6 @@ class Graph{
         << "Number of Edges: " << count << endl;
     }      
 
-    void saveToFileForDisplay(const std::string& filename) const {
-        std::ofstream outfile(filename);
-
-        // identify as VERTEX
-        outfile << "V" << endl;
-        // write each vertex to the file
-        for (const auto& vertex : getVertices()) {
-            outfile << vertex.getId() << std::setprecision(std::numeric_limits<double>::max_digits10) << "," << vertex.getX() << "," << vertex.getY() << " ";
-
-            // write the adjacency list
-            std::vector<int> v = vertex.getAdjacencyList();
-            for (int i = 0; i < v.size(); i++) {
-                // write the current element to file
-                outfile << v[i];
-
-                // if not last write a comma
-                if (i != v.size() - 1) {
-                    outfile << ",";
-                }
-            }
-
-            outfile << std::endl;
-        }
-
-        // identify as EDGE
-        outfile << "E" << endl;
-        // write each edge
-        for (const auto& edge : getEdges()) {
-            outfile << edge.getSourceVid() << ","
-                    << edge.getDestVid() << ","
-                    << edge.getLength() << ","
-                    << edge.getName() << endl;
-        }
-
-        outfile.close();
-    }
-
-    void loadFromFileForDisplay(const std::string& filename) {
-        std::ifstream infile(filename);
-        if (!infile.is_open()) {
-            std::cerr << "Failed to open file " << filename << std::endl;
-            return;
-        } else {
-            std::cout << "File opened successfully." << std::endl;
-            infile.sync();
-        }
-
-        std::string line;
-        bool loadingVertices = false;
-        bool loadingEdges = false;
-
-        while (std::getline(infile, line)) {
-            std::stringstream ss(line);
-            if (line[0] == 'V') {
-                std::cout<<"FOUND V: " << line << endl;
-                loadingVertices = true;
-                loadingEdges = false;
-                continue;
-            }
-            // check if we are starting to load edges
-            else if (line[0] == 'E') {
-                std::cout<<"FOUND E: " << line << endl;
-                loadingVertices = false;
-                loadingEdges = true;
-                continue;
-            }
-
-            // load vertices
-            if (loadingVertices) {
-                int id;
-                double x,y;
-                std::vector<int> adjList;
-
-                std::vector<std::string> values;
-                std::string item;
-                while (std::getline(ss, item, ',')) {
-                    values.push_back(item);
-                }
-
-                // for (auto& value : values) {
-                //     cout << value << " ";
-                // }
-
-                try {
-                    id = stoi(values[0]);
-                } catch(std::exception e) {
-                    cout<<"Error at id"<<endl;
-                    cout << "id: " << id << endl;
-                }
-                x = stod(values[1]);
-                // cout << "x: " << setprecision(std::numeric_limits<double>::max_digits10) << x << endl;
-                y = stod(values[2]);
-                // cout << "y: " << setprecision(std::numeric_limits<double>::max_digits10) << y << endl;
-
-                values.erase(values.begin(), values.begin() +3);
-
-                for (auto& value : values) {
-                    try {
-                        adjList.emplace_back(stoi(value));
-                    } catch(std::exception e) {
-                        cout<<"Error at adjlist"<<endl;
-                        cout << "adjListId: " << value;
-
-                    }
-                }
-
-                // std::cout << "id: " << id << " x: " << x << " y: " << y << " adj nr.: " << adjList.size() << " line: " << line << endl;
-                // Create a new vertex and add it to the graph
-                addVertex(Vertex(id, x, y, adjList));
-            }
-            // Load edges
-            else if (loadingEdges) {
-                std::istringstream iss(line);
-                int sourceVid, destVid, length;
-                std::string name;
-
-                // Read the source vertex id, destination vertex id, length, and name
-                std::getline(iss, name, ',');
-                iss >> sourceVid >> destVid >> length >> name;
-
-                // Create a new edge and add it to the graph
-                addEdge(Edge(sourceVid, destVid, length, name));
-            }
-        }
-
-        computeBoundaries();
-
-        std::cout<<"File parsed."<<std::endl;
-        infile.close();
-    }
-
     void addVertex(Vertex v) {
         mapping_.emplace(v.getId(),v);
     }
@@ -864,8 +733,8 @@ class Graph{
         l0 = computeLongitudinalCenter();
 
         for (auto& m : mapping_) {
-            m.second.setX(computeMercatorX(m.second.getLongitude()));
-            m.second.setY(computeMercatorY(m.second.getLatitude()));
+            m.second.setX(FcomputeMercatorX(m.second.getLongitude()));
+            m.second.setY(FcomputeMercatorY(m.second.getLatitude()));
         }
 
         // compute min max
