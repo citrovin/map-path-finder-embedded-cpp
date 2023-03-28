@@ -394,10 +394,19 @@ void MainWindow::on_algo_bfs_button_released()
         // get bounds
         int viewWidth = graphicsView->width();
         int viewHeight = graphicsView->height();
+
+        // timing
+        QElapsedTimer timer;
+        timer.start();
         // get vectors
         auto bfs_result = graph.bfs(startVertID, endVertID);
         std::vector<Vertex> nav_path = bfs_result.first;
         std::vector<Vertex> nav_path_visited = bfs_result.second;
+        // timer display
+        std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
+        QString str = "Algorithm took: " + QString::number(timer.elapsed()/1.0) + " ms";
+        QMessageBox::warning(this, "Elapsed time", str);
+
         // draw the result
         XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
@@ -423,6 +432,10 @@ void MainWindow::on_algo_djikstra_button_released()
         // get bounds
         int viewWidth = graphicsView->width();
         int viewHeight = graphicsView->height();
+
+        // timing
+        QElapsedTimer timer;
+        timer.start();
         // get vectors
         auto dijkstra_result = graph.dijkstra(startVertID, endVertID);
         std::vector<Vertex> nav_path = dijkstra_result.first;
@@ -430,6 +443,10 @@ void MainWindow::on_algo_djikstra_button_released()
         // draw result
         XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);
+        // timer display
+        std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
+        QString str = "Algorithm took: " + QString::number(timer.elapsed()/1.0) + " ms";
+        QMessageBox::warning(this, "Elapsed time", str);
 
         // set lcds for vertices visited and path length
         ui->algo_distance_lcd->setDigitCount(6);
@@ -452,10 +469,19 @@ void MainWindow::on_algo_astar_button_released()
         // get bounds
         int viewWidth = graphicsView->width();
         int viewHeight = graphicsView->height();
+
+        // timing
+        QElapsedTimer timer;
+        timer.start();
         // get vectors
         auto nav_paths = graph.astar(startVertID, endVertID);
         std::vector<Vertex> nav_path = nav_paths.first;
         std::vector<Vertex> nav_path_visited = nav_paths.second;
+        // timer display
+        std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
+        QString str = "Algorithm took: " + QString::number(timer.elapsed()/1.0) + " ms";
+        QMessageBox::warning(this, "Elapsed time", str);
+
         // draw result
         XHRDraw::drawNavPathVisited(graphicsView,nav_path_visited,graph,viewWidth,viewHeight);
         XHRDraw::drawNavPath(graphicsView,nav_path,graph,viewWidth,viewHeight);

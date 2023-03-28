@@ -448,7 +448,7 @@ color: rgb(0, 0, 0);</string>
         <string notr="true">color: rgb(0, 0, 0);</string>
        </property>
        <property name="text">
-        <string>Distance:</string>
+        <string>Distance (verts):</string>
        </property>
       </widget>
      </item>
