@@ -49,13 +49,43 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
     {
         setPen(QPen(Qt::green,0.5));
-        std::cout<<data(1).toString().toStdString()<<std::endl;
+//        std::cout<<data(1).toString().toStdString()<<std::endl;
         QGraphicsLineItem::hoverEnterEvent(event);
     }
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override
     {
         setPen(QPen(Qt::black,0.2));
+        QGraphicsLineItem::hoverEnterEvent(event);
+    }
+};
+
+class NavEdgeLineItem : public QGraphicsLineItem
+{
+public:
+    NavEdgeLineItem(double x1, double y1, double x2, double y2, QGraphicsItem *parent = nullptr)
+        : QGraphicsLineItem(x1, y1, x2, y2, parent)
+    {
+        setAcceptHoverEvents(true);
+    }
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override
+    {
+        QGraphicsLineItem::mousePressEvent(event);
+        QToolTip::showText(event->screenPos(), toolTip());
+    }
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override
+    {
+        setPen(QPen(Qt::yellow,0.7));
+//        std::cout<<data(1).toString().toStdString()<<std::endl;
+        QGraphicsLineItem::hoverEnterEvent(event);
+    }
+
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override
+    {
+        setPen(QPen(Qt::green,0.5));
         QGraphicsLineItem::hoverEnterEvent(event);
     }
 };
@@ -200,21 +230,28 @@ void XHRDraw::drawLine(QGraphicsView* view, std::vector<std::vector<double>>* li
     scene->addItem(path);
 }
 
-void XHRDraw::drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int y2, QColor color, double thickness, QVariant id, QVariant street_name, QVariant length) {
-    // Get the scene associated with the graphics view
+void XHRDraw::drawEdgeWithData(QGraphicsView* view, int x1, int y1, int x2, int y2, QColor color, double thickness, QVariant id, QVariant label, QVariant street_name, QVariant length) {
+    // get the scene associated with the graphics view
     QGraphicsScene* scene = view->scene();
 
-    // Create a new line item
-    EdgeLineItem* line = new EdgeLineItem(x1,y1,x2,y2);
+
+    // create a new line item
+    QGraphicsLineItem* line;
+    if(label.toString().toStdString() == "nav") {
+        line = new NavEdgeLineItem(x1,y1,x2,y2);
+    } else {
+        line = new EdgeLineItem(x1,y1,x2,y2);
+    }
 
     // set the pen color to the given color and thickness
     QPen pen(color, thickness);
     line->setPen(pen);
     line->setData(0, id);
-    line->setData(1, street_name);
+    line->setData(1, label);
 //    std::cout<<street_name.toString().toStdString()<<std::endl;
     line->setData(2, length);
-    line->setToolTip(street_name.toString());
+    line->setData(3, street_name);
+    line->setToolTip("Street name: " + street_name.toString() + "\nLength: " + QString::fromStdString(std::to_string(round(length.toDouble() * pow(10, 2)) / pow(10, 2))) + " meters");
     // Add the line item to the scene
     scene->addItem(line);
 }
@@ -301,7 +338,7 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
         double scaledX2 = std::round((dest_vertex.getX() - graph.getMinX()) * scaleX);
         double scaledY2 = std::round((dest_vertex.getY() - graph.getMinY()) * scaleY);
 
-        XHRDraw::drawEdgeWithData(graphicsView, scaledX1, scaledY1, scaledX2, scaledY2, Qt::black, 0.2, QVariant(source_vid), QString::fromStdString(edge.getName()), QVariant(edge.getLength()));
+        XHRDraw::drawEdgeWithData(graphicsView, scaledX1, scaledY1, scaledX2, scaledY2, Qt::black, 0.2, QVariant(source_vid), QString("") ,QString::fromStdString(edge.getName()), QVariant(edge.getLength()));
     }
 
     // iterate through the vertices of the graph and add them to the scene
@@ -318,7 +355,7 @@ void XHRDraw::drawGraph(QGraphicsView* graphicsView, QString fileName, int viewW
     }
 }
 
-void XHRDraw::drawNavPath(QGraphicsView* g,std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight) {
+void XHRDraw::drawNavPath(QGraphicsView* g, std::vector<Vertex> v, Graph graph_n, int viewWidth, int viewHeight) {
 
     // compute scale factors
     double scaleX = viewWidth / (graph_n.getMaxX() - graph_n.getMinX());
@@ -327,18 +364,45 @@ void XHRDraw::drawNavPath(QGraphicsView* g,std::vector<Vertex> v, Graph graph_n,
     auto verts = graph_n.getVertices();
     auto edges = graph_n.getEdges();
 
-#pragma omp parallel for
-    for (int i = 0; i < v.size(); ++i) {
-        // scale to screen size
-        double scaledX = std::round((v[i].getX() - graph_n.getMinX()) * scaleX );
-        double scaledY = std::round((v[i].getY() - graph_n.getMinY()) * scaleY );
+    auto v_size =  v.size();
 
-        int _id = v[i].getId();
+#pragma omp parallel for
+    for (int i = 1; i < v_size; ++i) {
+        // scale to screen size
+        double scaledX1 = std::round((v[i-1].getX() - graph_n.getMinX()) * scaleX );
+        double scaledY1 = std::round((v[i-1].getY() - graph_n.getMinY()) * scaleY );
+        double scaledX2 = std::round((v[i].getX() - graph_n.getMinX()) * scaleX );
+        double scaledY2 = std::round((v[i].getY() - graph_n.getMinY()) * scaleY );
+
+        int _id = v[i-1].getId();
     //        std::cout<<_id<<endl;
         // draw vertex
-        XHRDraw::drawVertexWithData(g, scaledX, scaledY, 0.5, Qt::green, QVariant(_id), QVariant("nav"));
-    }
+        XHRDraw::drawVertexWithData(g, scaledX1, scaledY1, 0.5, Qt::green, QVariant(_id), QVariant("nav"));
 
+        // find edge data?
+        auto source_vid = v[i-1].getId();
+        auto end_vid = v[i].getId();
+        auto it = std::find_if(edges.begin(), edges.end(), [source_vid, end_vid](const Edge& e) {
+            return e.getSourceVid() == source_vid && e.getDestVid() == end_vid;
+        });
+
+        Edge edge;
+
+        if (it != edges.end()) {
+            edge = *it;
+        } else {
+            std::cout<<"Something went wrong... why is there no edge here? --- drawNavPath, edges"<<std::endl;
+        }
+        // draw the edge to the next vertex
+        XHRDraw::drawEdgeWithData(g, scaledX1, scaledY1, scaledX2, scaledY2, Qt::green, 0.5, QVariant(source_vid), QString::fromStdString("nav"),QString::fromStdString(edge.getName()), QVariant(edge.getLength()));
+    }
+    // add last vertex
+    double scaledX1 = std::round((v[v_size].getX() - graph_n.getMinX()) * scaleX );
+    double scaledY1 = std::round((v[v_size].getY() - graph_n.getMinY()) * scaleY );
+
+    int _id = v[v_size].getId();
+
+    XHRDraw::drawVertexWithData(g, scaledX1, scaledY1, 0.5, Qt::green, QVariant(_id), QVariant("nav"));
 }
 
 void XHRDraw::clearItems(QGraphicsView* view) {
