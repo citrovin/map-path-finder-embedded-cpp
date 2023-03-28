@@ -29,8 +29,6 @@ public:
     int getEndVert();
 
 private slots:
-    void on_load_graph_button_released();
-
     void on_clear_screen_button_released();
 
     void on_tool_zoom_button_released();
@@ -71,7 +69,7 @@ private:
     int startVertID = -1;
     int endVertID = -1;
     QPointF lastMousePos;
-    void updateAlgoLCD(int, int);
     double prevRotation = 0;
+    bool graphDisplayed = false;
 };
 #endif // MAINWINDOW_H

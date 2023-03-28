@@ -190,83 +190,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return QMainWindow::eventFilter(obj, event);
 }
 
-void MainWindow::on_load_graph_button_released()
-{
-    // Get the graphics view from the UI
-    QGraphicsView* graphicsView = ui->graphicsView;
-
-    // get bounds
-    int viewWidth = graphicsView->width();
-    int viewHeight = graphicsView->height();
-
-//    XHRDraw::drawCircle(graphicsView,150, 150, 50, Qt::blue);
-
-    // create a file dialog to select the file to read
-    // TODO: ENABLE IN FINAL VERSION
-    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::currentPath());
-
-    // Timing
-    QElapsedTimer timer;
-    timer.start();
-//    // create a QTextEdit widget
-//    QTextEdit *textEdit = new QTextEdit();
-
-//    // set the text of the widget
-//    textEdit->setPlainText("Hello, world!");
-
-//    // show the widget
-//    textEdit->show();
-
-//    // read the file contents and set them to the QTextEdit widget
-//    QTextStream in(&file);
-//    QString text = in.readAll();
-//    textEdit->setPlainText(text);
-
-//    // close the file
-//    file.close();
-
-//        QString fileName = "data\\graph_dc_area.2022-03-11.txt";
-//        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\test_data.txt";
-//    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
-    // open the file
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        // error opening the file
-        QMessageBox::warning(nullptr, "Error", "Could not open file");
-    } else {
-        QMessageBox::information(nullptr, "Success", "Data file opened");
-    }
-
-    // create a Graph object
-//    Graph graph = loadGraph(fileName.toStdString());
-    Graph g(fileName.toStdString());
-    g.computeMercator();
-
-    graph = g;
-    int progress_max = graph.getVertices().size() + graph.getEdges().size();
-
-    // TODO: implement threading and mutex
-    // Create the progress bar window
-    ProgressBar progressBarWindow(nullptr, progress_max);
-
-    // Show the progress bar window
-//    progressBarWindow.show();
-
-    // start loading graph
-    // draw without street data
-    XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow);
-
-    // Hide the progress bar window when the operation is complete
-//    progressBarWindow.hide();
-
-    // Code to be timed
-    std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
-    QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
-    MessageBox::show("Elapsed time", str);
-    file.close();
-}
-
-
 void MainWindow::on_clear_screen_button_released()
 {
     // get the first QGraphicsView object in the widget
@@ -274,6 +197,11 @@ void MainWindow::on_clear_screen_button_released()
 
     // clear the scene
     XHRDraw::clearItems(graphicsView);
+
+    graphicsView->resetTransform();
+
+    // reset graph display check
+    graphDisplayed = false;
 }
 
 void MainWindow::selectTool(std::string t) {
@@ -403,63 +331,70 @@ void MainWindow::on_util_reset_zoom_button_released()
 
 void MainWindow::on_load_graph_button_2_released()
 {
+    if(graphDisplayed == false) {
+        // Get the graphics view from the UI
+        QGraphicsView* graphicsView = ui->graphicsView;
 
-    // Get the graphics view from the UI
-    QGraphicsView* graphicsView = ui->graphicsView;
+        graphicsView->setToolTipDuration(1000);
 
-    graphicsView->setToolTipDuration(1000);
+        // get bounds
+        int viewWidth = graphicsView->width();
+        int viewHeight = graphicsView->height();
 
-    // get bounds
-    int viewWidth = graphicsView->width();
-    int viewHeight = graphicsView->height();
+    //    XHRDraw::drawCircle(graphicsView,150, 150, 50, Qt::blue);
 
-//    XHRDraw::drawCircle(graphicsView,150, 150, 50, Qt::blue);
+        QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::currentPath());
 
-    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::currentPath());
+        // Timing
+        QElapsedTimer timer;
+        timer.start();
+    //        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
+    //        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\test_data.txt";
+    //    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
+        // open the file
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            // error opening the file
+            QMessageBox::warning(nullptr, "Error", "Could not open file");
+        } else {
+            QMessageBox::information(nullptr, "Success", "Data file opened");
 
-    // Timing
-    QElapsedTimer timer;
-    timer.start();
-//        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\graph_dc_area.2022-03-11.txt";
-//        QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\test_data.txt";
-//    QString fileName = "D:\\Projects\\SA\\EC++\\map-path-finder-embedded-cpp\\data\\display.txt";
-    // open the file
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        // error opening the file
-        QMessageBox::warning(nullptr, "Error", "Could not open file");
+
+            // create a Graph object
+        //    Graph graph = loadGraph(fileName.toStdString());
+            Graph g(fileName.toStdString());
+            g.computeMercator();
+
+            graph = g;
+
+            // TODO: implement threads and mutex for the progressbar display...
+            // Create the progress bar window
+            int progress_max = graph.getVertices().size() + graph.getEdges().size();
+            ProgressBar progressBarWindow(nullptr, progress_max);
+
+            // Show the progress bar window
+        //    progressBarWindow.show();
+
+            // start loading graph
+            // draw with street data ~ 27x slower
+            XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow,true);
+
+            // Hide the progress bar window when the operation is complete
+        //    progressBarWindow.hide();
+
+            // Code to be timed
+            std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
+            QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
+            MessageBox::show("Elapsed time", str);
+
+            file.close();
+
+            // set graph display check
+            graphDisplayed = true;
+        }
     } else {
-        QMessageBox::information(nullptr, "Success", "Data file opened");
+        QMessageBox::warning(this, "Warning!", "There is already an active graph in the scene.");
     }
-
-    // create a Graph object
-//    Graph graph = loadGraph(fileName.toStdString());
-    Graph g(fileName.toStdString());
-    g.computeMercator();
-
-    graph = g;
-
-    // TODO: implement threads and mutex for the progressbar display...
-    // Create the progress bar window
-    int progress_max = graph.getVertices().size() + graph.getEdges().size();
-    ProgressBar progressBarWindow(nullptr, progress_max);
-
-    // Show the progress bar window
-//    progressBarWindow.show();
-
-    // start loading graph
-    // draw with street data ~ 27x slower
-    XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow,true);
-
-    // Hide the progress bar window when the operation is complete
-//    progressBarWindow.hide();
-
-    // Code to be timed
-    std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
-    QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
-    MessageBox::show("Elapsed time", str);
-
-    file.close();
 }
 
 
@@ -535,12 +470,6 @@ void MainWindow::on_algo_astar_button_released()
         QMessageBox::warning(this, "Warning!", "You must select a start and end point first.");
     }
 }
-
-void MainWindow::updateAlgoLCD(int visited, int length) {
-//    ui->lcd
-    // TODO: implement algorithm stats display
-}
-
 
 void MainWindow::on_clear_path_button_released()
 {

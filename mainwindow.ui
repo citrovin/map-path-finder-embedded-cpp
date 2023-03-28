@@ -50,27 +50,7 @@ color: rgb(0, 0, 0);</string>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QPushButton" name="clear_screen_button">
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0);</string>
-       </property>
-       <property name="text">
-        <string>Clear Screen</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
-      <widget class="QPushButton" name="load_graph_button">
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0);</string>
-       </property>
-       <property name="text">
-        <string>Load Graph Fast</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
       <widget class="QPushButton" name="load_graph_button_2">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loads all edge data as well&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -79,7 +59,17 @@ color: rgb(0, 0, 0);</string>
         <string notr="true">color: rgb(0, 0, 0);</string>
        </property>
        <property name="text">
-        <string>Load Graph Full</string>
+        <string>Load Graph</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="clear_screen_button">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>Clear Screen</string>
        </property>
       </widget>
      </item>
