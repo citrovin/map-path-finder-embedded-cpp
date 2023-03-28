@@ -332,6 +332,26 @@ void MainWindow::on_util_reset_zoom_button_released()
     ui->horizontalSlider->setSliderPosition(0);
 }
 
+bool MainWindow::checkFileHeader(std::string filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Unable to open file " << filename << std::endl;
+        return false;
+    }
+    std::string line;
+    getline(file, line);
+    if (line != "# Vertex List") {
+        std::cerr << "Invalid file header in " << filename << std::endl;
+        return false;
+    }
+    getline(file, line);
+    if (line != "# V,vertexid,longitude,latitude,x*,y*") {
+        std::cerr << "Invalid file header in " << filename << std::endl;
+        return false;
+    }
+    return true;
+}
+
 
 void MainWindow::on_load_graph_button_2_released()
 {
@@ -359,42 +379,47 @@ void MainWindow::on_load_graph_button_2_released()
         QFile file(fileName);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             // error opening the file
-            QMessageBox::warning(nullptr, "Error", "Could not open file");
+            QMessageBox::warning(this, "Error", "Could not open file");
         } else {
-            QMessageBox::information(nullptr, "Success", "Data file opened");
+            std::string f = fileName.toStdString();
+            if(checkFileHeader(f)) {
+                QMessageBox::information(this, "Success", "Data file opened");
 
 
-            // create a Graph object
-        //    Graph graph = loadGraph(fileName.toStdString());
-            Graph g(fileName.toStdString());
-            g.computeMercator();
+                // create a Graph object
+            //    Graph graph = loadGraph(fileName.toStdString());
+                Graph g(fileName.toStdString());
+                g.computeMercator();
 
-            graph = g;
+                graph = g;
 
-            // TODO: implement threads and mutex for the progressbar display...
-            // Create the progress bar window
-            int progress_max = graph.getVertices().size() + graph.getEdges().size();
-            ProgressBar progressBarWindow(nullptr, progress_max);
+                // TODO: implement threads and mutex for the progressbar display...
+                // Create the progress bar window
+                int progress_max = graph.getVertices().size() + graph.getEdges().size();
+                ProgressBar progressBarWindow(nullptr, progress_max);
 
-            // Show the progress bar window
-        //    progressBarWindow.show();
+                // Show the progress bar window
+            //    progressBarWindow.show();
 
-            // start loading graph
-            // draw with street data ~ 27x slower
-            XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow,true);
+                // start loading graph
+                // draw with street data ~ 27x slower
+                XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, &progressBarWindow,true);
 
-            // Hide the progress bar window when the operation is complete
-        //    progressBarWindow.hide();
+                // Hide the progress bar window when the operation is complete
+            //    progressBarWindow.hide();
 
-            // Code to be timed
-            std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
-            QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
-            MessageBox::show("Elapsed time", str);
+                // Code to be timed
+                std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
+                QString str = "Elapsed time: " + QString::number(timer.elapsed()/1000.0) + " seconds";
+                MessageBox::show("Elapsed time", str);
 
-            file.close();
+                file.close();
 
-            // set graph display check
-            graphDisplayed = true;
+                // set graph display check
+                graphDisplayed = true;
+            } else {
+                QMessageBox::warning(this, "Warning!", "Invalid file contents.");
+            }
         }
     } else {
         QMessageBox::warning(this, "Warning!", "There is already an active graph in the scene.");

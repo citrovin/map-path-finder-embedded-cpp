@@ -71,5 +71,6 @@ private:
     QPointF lastMousePos;
     double prevRotation = 0;
     bool graphDisplayed = false;
+    bool checkFileHeader(std::string filename);
 };
 #endif // MAINWINDOW_H
