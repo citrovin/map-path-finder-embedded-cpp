@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
                 << "\t--filename specifies the data file. DEFAULT = 'data/test_data.txt'\n"
                 << "\t--start defines the starting node. DEFAULT = '1'\n"
                 << "\t--end defines the ending node. DEFAULT = '5'\n"
-                << "\t--algorithm defines the preferred search algorithm. DEFAULT = 'bfs'" 
+                << "\t--algorithm defines the preferred search algorithm. DEFAULT = 'none'" 
                 << std::endl;
         
         return 0;
