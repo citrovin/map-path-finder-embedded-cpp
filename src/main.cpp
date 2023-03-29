@@ -20,9 +20,6 @@ Arguments:
 // ---- arg parsing --------
 #include "headers/argparser.h"
 // -------------------------
-// ---- DISPLAY MODULE -----
-#include "headers/display.h"
-// -------------------------
 
 int main(int argc, char *argv[]){
     // instantiate argparser object
@@ -37,8 +34,7 @@ int main(int argc, char *argv[]){
 
     // ignore other args if display is present
     if(ap.cmdOptionExists("--display")) {
-        displayMessage("Display module properly linked.\n");
-
+        std::cout<<"Display module properly linked."<<std::endl;
         return 0;
     }
 
@@ -110,20 +106,4 @@ int main(int argc, char *argv[]){
     if(print_edges) {
         g.print_edges();
     }
-
-    if(save_to_file) {
-        cout<<"\nStarting mercator computations... ";
-        g.computeMercator();
-        g.saveToFileForDisplay("data/display.txt");
-        cout<<"finished."<<endl;
-    }
-
-    if(load_display_debug) {
-        cout<<"DEBUG - Loading file for display..."<<endl;
-        g.loadFromFileForDisplay("data/display.txt");
-        cout<<"\nFinished."<<endl;
-        g.print_verteces();
-    }
-
-    
 }
