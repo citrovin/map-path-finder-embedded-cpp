@@ -245,16 +245,35 @@ int MainWindow::getStartVert() {
 void MainWindow::on_util_flip_vertical_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
-    // flip the viewport vertically
-    graphicsView->setTransform(QTransform(1, 0, 0, -1, 0, 0));
+    auto t = graphicsView->transform();
+
+    // flip vertical fix
+    QTransform transform = graphicsView->transform();
+    double m11 = transform.m11(); // x scale
+    double m12 = transform.m12(); // y skew
+    double m21 = transform.m21(); // x skew
+    double m22 = transform.m22(); // y scale
+    double dx = transform.dx(); // x translation
+    double dy = transform.dy(); // y translation
+
+    graphicsView->setTransform(QTransform(m11, -m12, m21, -m22, dx, dy));
 }
 
 
 void MainWindow::on_util_flip_horizontal_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
-    // flip the viewport horizontally
-    graphicsView->setTransform(QTransform(-1, 0, 0, 1, 0, 0));
+
+    // flip horizontal fix
+    QTransform transform = graphicsView->transform();
+    double m11 = transform.m11(); // x scale
+    double m12 = transform.m12(); // y skew
+    double m21 = transform.m21(); // x skew
+    double m22 = transform.m22(); // y scale
+    double dx = transform.dx(); // x translation
+    double dy = transform.dy(); // y translation
+
+    graphicsView->setTransform(QTransform(-m11, m12, -m21, m22, dx, dy));
 }
 
 
@@ -291,9 +310,7 @@ void MainWindow::on_util_reset_rotation_button_released()
 void MainWindow::on_util_reset_zoom_button_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
-    QTransform transform = graphicsView->transform();
-    transform.reset();
-    graphicsView->setTransform(transform);
+    graphicsView->setTransform(QTransform(1, 0, 0, -1, 0, 0));
 }
 
 // quick check for the file contents
@@ -362,6 +379,9 @@ void MainWindow::on_load_graph_button_2_released()
                 // start loading graph
                 // draw with street data
                 XHRDraw::drawGraph(graphicsView,fileName,viewWidth, viewHeight, graph, true);
+
+                // flip vertical to match google maps orientation
+                graphicsView->setTransform(QTransform(1, 0, 0, -1, 0, 0));
 
                 // timer display
                 std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
