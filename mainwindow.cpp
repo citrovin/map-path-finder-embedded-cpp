@@ -245,7 +245,6 @@ int MainWindow::getStartVert() {
 void MainWindow::on_util_flip_vertical_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
-    auto t = graphicsView->transform();
 
     // flip vertical fix
     QTransform transform = graphicsView->transform();
@@ -311,6 +310,8 @@ void MainWindow::on_util_reset_zoom_button_released()
 {
     QGraphicsView* graphicsView = ui->graphicsView;
     graphicsView->setTransform(QTransform(1, 0, 0, -1, 0, 0));
+    // fit all in scene
+    graphicsView->fitInView(graphicsView->scene()->itemsBoundingRect());
 }
 
 // quick check for the file contents
@@ -382,6 +383,9 @@ void MainWindow::on_load_graph_button_2_released()
 
                 // flip vertical to match google maps orientation
                 graphicsView->setTransform(QTransform(1, 0, 0, -1, 0, 0));
+
+                // fit all in scene
+                graphicsView->fitInView(graphicsView->scene()->itemsBoundingRect());
 
                 // timer display
                 std::cout << "Elapsed time:" << timer.elapsed() << "milliseconds" << std::endl;
