@@ -1,5 +1,7 @@
 # Map Path Finder
 
+The Map Path Finder is an application that computes the shortest path between two points in a map, in this case Washington DC. It includes a GUI that shows the shortest path and all of the visited vcertices during the search process. The start and end vertices can be chosen by the user, thorugh the GUI. Furthermore, the search algorithm can chosen. We implemented three search algorithms, namely 1) depth first search, 2) breadth first search, and 3) A*. The application is programmed in C++.
+
 ## Instatiating the Graph using the Boost Graph Library (BGL)
 Properties of our Graph:
 - directed graph
